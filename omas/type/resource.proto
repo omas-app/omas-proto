@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+
+message Resource {
+
+	//todo define stanalone resource
+
+	string id = 1;
+	string display_name = 2 [json_name="n"]; //file name
+	string type = 3; //content type as mime
+	int32  size = 4; //content size in bytes
+
+	google.protobuf.Timestamp modified_at = 7 [json_name="mts"];
+	fixed32 crc32 = 8; //hash
+
+	oneof content {
+		string url = 10; //content url
+		bytes data = 11;
+	}
+
+	repeated Resource thumbnails = 14 [json_name="thumbs"]; //resized and preview images 
+	map<string, google.protobuf.Value> attributes = 15 [json_name="atts"];
+
+	google.protobuf.Value metadata = 25 [json_name="meta"];
+
+	bool deleted = 30 [json_name="del"];
+}

@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+
+message Payment {
+	google.protobuf.Timestamp timestamp = 1 [json_name="ts"];
+	
+	string system = 5 [json_name="sys"];
+	string method = 6;
+	State  state = 7;
+	string sender = 8 [json_name="s"];
+	string receiver = 9 [json_name="r"];
+	string foreign_id = 10 [json_name="fid"];
+	string description = 11 [json_name="desc"];
+	string currency = 12 [json_name="ccy"];
+	double amount = 13 [json_name="a"];
+
+	google.protobuf.Value metadata = 25 [json_name="meta"];
+
+	enum State {
+		STATE_UNSPECIFIED = 0;
+		PENDING = 1;
+		PROCESSING = 16;
+		PROCESSED = 17;
+		COMPLETING = 128;
+		COMPLETED = 129;
+		FAILED = 160;
+		EXPIRED = 161;
+		CANCELED = 162;
+
+		UNKNOWN = 255;
+	}
+}

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/struct.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+message Tenant {
+	string id = 1;	
+	string slug = 2 [json_name="s"];
+	string display_name = 3 [json_name="n"];	
+
+	google.protobuf.Value metadata = 25 [json_name="meta"];
+}

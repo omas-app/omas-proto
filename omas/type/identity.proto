@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/struct.proto";
+
+import "omas/type/tenant.proto";
+import "omas/type/user.proto";
+import "omas/type/vendor.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+message Identity {
+	oneof content {
+		google.protobuf.Value value = 1;
+		string email = 2;
+		string mobile = 3;
+		User user = 4;
+		Vendor vendor = 5;
+	}
+}

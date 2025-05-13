@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/struct.proto";
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+import "omas/type/identity.proto";
+import "omas/type/delivery.proto";
+import "omas/type/discount.proto";
+import "omas/type/payment.proto";
+import "omas/type/product.proto";
+import "omas/type/vendor.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+message Order {
+	reserved 5;
+
+	string id = 1; //uid
+	string number = 2 [json_name="nr"]; //order number (not unique)
+	google.protobuf.Timestamp create_time = 3  [json_name="cts"];
+	
+	string vendor = 4 [
+		json_name = "vn",
+		(google.api.field_behavior) = REQUIRED,
+		(google.api.resource_reference) = {
+			type: "omas.type/Vendor"
+		}];
+
+	//Vendor vendor = 5 [deprecated=true];
+	Identity contact = 6;
+
+	DeliveryInfo delivery = 7;
+	Payment payment = 8;
+	
+	Amount amount = 10 [json_name="a"];
+	map<string, double> vat_a = 11;		//vat amounts: 0%: 2.00, 10%: 10.70, 20%: 2.55
+
+	repeated OrderLine lines = 15;
+
+	google.protobuf.Value metadata = 25 [json_name="meta"];
+
+	message Amount {
+		string currency = 1 [json_name="ccy"];
+		double value = 2 [json_name="v"]; //sub total
+		//double shipping_cost = 3; //shipping has vat 10 or 20 depending on products
+		//double discount = 4;		
+		map<string, double> charges = 5; //shipping cost, service fee, reusable deposit
+		map<string, double> discounts = 7; //onlinebonus, 10% Discount
+
+		double total = 10 [json_name="t"];		 
+	}
+}
+
+message OrderLine {
+	reserved 24;
+	
+	Entry entry = 5;
+	repeated Entry addons = 6;
+	
+	int32 quantity = 8 [json_name="q"];
+
+	google.protobuf.DoubleValue vat_a = 11; //vat amount
+	double total = 12 [json_name="t"]; //incl. vat
+
+	Discount discount = 13; //discount reference
+
+	//the vendor is not allowed to decrease the quantity to zero
+	bool required = 22; 
+
+	string note = 23; //note of customer
+	//bool optional = 24; //the vendor is allowed to decrease the quantity to zero
+
+	//google.protobuf.Value metadata = 25;
+
+	message Entry {
+		reserved 14;
+
+		EntryType type = 3; //default to artikel
+
+		string name = 5 [json_name="n"];
+		string description = 6 [json_name="desc"];
+		double price = 7; //incl. vat		
+		google.protobuf.DoubleValue vat_p = 8; //vat percent
+
+		string product_id = 13 [
+			(google.api.resource_reference) = {
+				type: "omas.type/Product"
+			}];
+
+		//Product legacy_product = 14;
+		repeated ProductOption options = 15 [json_name="opts"];
+
+		enum EntryType {
+			ENTRY_TYPE_UNSPECIFIED = 0;
+			ARTIKEL = 1;
+			CHARGE = 2;
+			DISCOUNT = 3;
+		}
+	}
+}
+
+

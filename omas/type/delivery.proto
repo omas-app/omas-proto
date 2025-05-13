@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/timestamp.proto";
+//import "google/protobuf/struct.proto";
+import "google/type/latlng.proto";
+
+import "omas/type/location.proto";
+import "omas/type/availability.proto";
+
+
+option csharp_namespace = "Omas.Protos";
+
+
+message DeliveryInfo {
+	Location location = 5 [json_name="loc"];
+	string mobile = 6;
+	string note = 7; //note for delivery man
+	bool pick_up = 8;
+	google.protobuf.Timestamp time = 9; //wanted delivery time
+	string floor = 10;
+	string door = 11;
+	string stair = 12;
+	string house = 13; //house number
+}
+
+message DeliveryZone {
+
+	string display_name = 2  [json_name="n"]; //name
+
+	string postal_code = 5;
+	//todo country_code
+	
+	Radius radius = 9;
+
+	double min_price = 10; //incl. vat		
+
+	double service_fee = 12; //incl. vat
+	double service_fee_max = 13; //min price for free delivery 
+
+	//todo delivery time
+
+	repeated AvailabilityTime availability_time = 15;
+
+	message Radius {
+		google.type.LatLng lat_lng = 1;
+		int32 radius = 2; //radius in meter
+	}
+}

@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package omas.v1;
+
+//import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+//import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+
+import "omas/type/vendor.proto";
+import "omas/type/user.proto";
+import "omas/type/fulfillment.proto";
+
+option csharp_namespace = "Omas.Protos.V1";
+
+service OmasStoreService {
+	rpc Monitor(MonitorStoreRequest) returns (stream StoreReply) {
+		option (google.api.http) = { 
+			get: "/v1/store/monitor" 
+		};
+	}
+}
+
+message MonitorStoreRequest {
+	repeated string filters = 5;
+	uint64 start_sequence = 6 [json_name="startSeq"];
+	google.protobuf.Timestamp start_time = 7;
+	//todo delivery_policy mode change stream vs single
+
+	//todo flags headers_only, subjects_only, last, new, count
+}
+
+message StoreReply {
+
+	map<string, google.protobuf.Value> headers = 4 [json_name="hdrs"];
+	DataMessage message = 5 [json_name = "msg"];
+
+	//string subject = X [json_name="sub"];
+	//google.protobuf.Timestamp timestamp = X [json_name="ts"];
+	//uint64 sequence = X [json_name="seq"];
+	//uint64 revision = X [json_name="rev"];
+
+	
+}
+
+message DataMessage {
+	oneof content {
+		//google.protobuf.Value value = 5;
+		omas.type.Vendor vendor = 10;
+		omas.type.User   user   = 11;
+		omas.type.Fulfillment fulfillment = 12;
+	}
+}

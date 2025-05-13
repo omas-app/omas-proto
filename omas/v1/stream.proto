@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package omas.v1;
+
+//import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+//import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "google/api/annotations.proto"; 
+
+
+import "omas/type/tenant.proto";
+import "omas/type/vendor.proto";
+import "omas/type/user.proto";
+import "omas/type/order.proto";
+import "omas/type/fulfillment.proto";
+
+option csharp_namespace = "Omas.Protos.V1";
+
+
+service OmasStreamService {
+	rpc Monitor(MonitorStreamRequest) returns (stream StreamReply){
+		option (google.api.http) = { 
+			get: "/v1/stream/monitor" 
+		};
+	}
+}
+
+message MonitorStreamRequest {
+	repeated string filters = 5;
+	uint64 start_sequence = 6 [json_name="startSeq"];
+	google.protobuf.Timestamp start_time = 7;
+	//todo delivery_policy mode change stream vs single
+	//todo flags headers_only, subjects_only, last, new, count
+}
+
+message StreamReply {
+	map<string, google.protobuf.Value> headers = 4 [json_name="hdrs"];
+	StreamMessage message = 5 [json_name = "msg"];
+}
+
+message StreamMessage {
+	reserved 3,4,7;
+
+	google.protobuf.Timestamp timestamp = 1 [json_name="ts", deprecated = true]; //use header
+	string id = 2 [deprecated = true]; //unused
+	//omas.type.Tenant tenant = 3 [json_name="tn", deprecated = true]; //use scope 
+	//omas.type.Vendor vendor = 4 [json_name="vn", deprecated = true]; //use scope
+
+	oneof content {
+		google.protobuf.Value value = 5;
+		//Vendor vendor_info = 6;
+		//omas.type.Order order = 7;
+		omas.type.Fulfillment fulfillment = 8;
+		//ProductGroup product_group = 9;
+		omas.type.Vendor vendor = 10;
+		omas.type.User user = 11;
+	}
+
+	//update mask (repeated fields are replaced)
+	google.protobuf.FieldMask update_mask = 25; 
+	//Batch batch = 64;
+}

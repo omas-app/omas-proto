@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package omas.type;
+
+//import "google/protobuf/struct.proto";
+
+import "omas/type/availability.proto";
+import "omas/type/delivery.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+
+message Discount {
+	
+	string slug = 2 [json_name="s"];
+
+	string display_name = 5 [json_name="n"];
+
+	repeated Filter filters = 6 [json_name="f"];
+
+	double amount_total = 10;
+	double amount_piece =  11;
+	double percent = 12;
+
+	repeated Item items = 13; //gift items
+
+	message Filter {
+		repeated string selectors = 5 [json_name="sel"]; //tag or path: cat-a/cat-b/product-1
+	
+		double amount = 7; //min amount
+		int32  quantity = 8 [json_name="q"]; //min quantity
+	
+		repeated DeliveryZone delivery_zones = 10;
+		repeated AvailabilityTime availability_time = 11;
+
+		repeated string exclusions = 15 [json_name="excl"]; //tag or path: cat-a/cat-b/product-1	
+	}
+
+	message Item {
+		string slug = 2 [json_name="s"];
+		string name = 5 [json_name="n"];
+		repeated string selectors = 6 [json_name="sel"]; //tag or path: cat-a/cat-b/product-1
+		int32 quantity = 7 [json_name="q"];		
+	}
+}

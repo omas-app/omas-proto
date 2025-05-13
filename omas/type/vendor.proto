@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/struct.proto";
+
+//import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+import "omas/type/location.proto";
+import "omas/type/contact.proto";
+import "omas/type/delivery.proto";
+import "omas/type/product.proto";
+import "omas/type/disturbance.proto";
+import "omas/type/resource.proto";
+import "omas/type/discount.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+message Vendor {
+	option (google.api.resource) = {
+		type: "omas.type/Vendor"
+		pattern: "vendors/{vendor}"
+		singular: "vendor"
+		plural: "vendors"
+	};
+
+	string id = 1;
+	string slug = 2  [json_name="s"];
+
+	//resource name: vendors/{vendor}
+	string name = 3  [(google.api.field_behavior) = IDENTIFIER]; 
+
+	string  display_name = 5  [json_name="n"];
+	Info    info = 6  [json_name="i"];
+	Contact owner = 7;
+
+	repeated Location locations = 11 [json_name="loc"];
+	string currency = 12  [json_name="ccy"];
+	string type = 13; //food, store
+	repeated string categories = 14  [json_name="cats"]; //Restaurant, Electronics, Appliances & Repair
+	repeated string tags = 15;
+	repeated ProductGroup product_groups = 16;
+
+	repeated DeliveryZone delivery_zones = 17;
+	repeated Discount discounts = 18;
+
+	Disturbance disturbance = 20;
+
+	google.protobuf.Value metadata = 25  [json_name="meta"];	
+
+	message Info {
+		Rating rating = 4;
+		string description = 5  [json_name="desc"];
+		Resource logo = 6;
+
+		string website = 10;
+
+		repeated Resource images = 14; //gallery images
+		map<string, google.protobuf.Value> attributes = 15  [json_name="atts"];
+	}
+}
+
+message Rating {
+	double value = 1  [json_name="v"];
+	int32 count = 2;
+}

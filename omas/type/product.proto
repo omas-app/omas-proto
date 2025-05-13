@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/struct.proto";
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+import "omas/type/availability.proto";
+import "omas/type/resource.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+
+message Product {
+	option (google.api.resource) = {
+		type: "omas.type/Product"
+		pattern: "vendors/{vendor}/products/{product}"
+		singular: "product"
+		plural: "products"
+	};
+
+	string id = 1;
+	string number = 2  [json_name="nr"];
+
+	string name = 3  [(google.api.field_behavior) = IDENTIFIER]; 
+
+	string display_name = 5  [json_name="n"];
+	Info   info = 6  [json_name="i"];
+
+	double price = 11; //incl. vat
+	google.protobuf.DoubleValue vat_p = 12; //percent
+
+	repeated ProductOption options = 14  [json_name="opts"];
+	bool no_inherit = 15; //do not inherit options from group
+
+	//Vendor vendor = 00;
+
+	//google.protobuf.Value metadata = 25;
+
+	bool deleted = 30  [json_name="del"];
+
+	message Info {
+		string description = 5 [json_name="desc"];
+		
+		repeated Resource images = 14;
+		map<string, google.protobuf.Value> attributes = 15 [json_name="atts"];
+	}
+
+	//message Filter {
+	//	repeated string selectors = 5; //tag or path: cat-a/cat-b/product-1
+	
+		//double amount = 7; //min amount
+			
+	//	repeated string exclusions = 15; //tag or path: cat-a/cat-b/product-1	
+	//}
+}
+
+message ProductOption {
+	string slug = 2  [json_name="s"];
+
+	string name = 5  [json_name="n"];
+	int32 range_min = 6  [json_name="min"]; //min total selections
+	int32 range_max = 7  [json_name="max"]; //max total selections
+	int32 range_max_quantity = 8 [json_name="maxQ"]; //max quantity
+	int32 range_free = 9 [json_name="free"]; //free count
+	
+	repeated Value values = 10  [json_name="vals"];
+
+	message Value {
+		string slug = 2  [json_name="s"];
+	
+		string name = 5  [json_name="n"];
+	
+		double price = 11  [json_name="p"];
+	}
+}
+
+
+message ProductGroup {
+
+	string slug = 2  [json_name="s"];
+
+	string name = 5  [json_name="n"];
+	Info info = 6    [json_name="i"];
+	
+	repeated Product products = 10;
+	repeated ProductOption options = 11  [json_name="opts"];
+	
+	repeated AvailabilityTime availability_time = 14;
+	repeated string tags = 15;
+
+	bool deleted = 30  [json_name="del"]; 
+
+	message Info {
+		string description = 5 [json_name="desc"];
+		int32 sort_order = 6 [json_name="sort"];
+		
+		repeated Resource images = 14;
+		map<string, google.protobuf.Value> attributes = 15 [json_name="atts"];
+	}
+}
+

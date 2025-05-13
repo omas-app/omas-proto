@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/struct.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+message Contact {
+	
+	string display_name = 5 [json_name="n"];
+	string email = 6;
+	string phone = 7;
+	string postal_address = 8 [json_name="postalAddr"];
+
+	string organisation = 10 [json_name="org"];
+	string vat_number = 11 [json_name="vatNr"];
+	string reg_number = 12 [json_name="regNr"];
+	string iban = 13;
+
+	map<string, google.protobuf.Value> fields = 15;
+}

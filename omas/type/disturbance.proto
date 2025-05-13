@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/timestamp.proto";
+//import "google/protobuf/struct.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+
+message Disturbance {	
+	google.protobuf.Timestamp timestamp = 1 [json_name="ts"];
+	//todo end date
+
+	string reason = 5;
+
+	bool no_pickup = 10;
+	bool no_delivery = 11;
+}
+

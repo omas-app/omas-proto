@@ -1,0 +1,339 @@
+syntax = "proto3";
+
+package omas.v1;
+
+import "google/protobuf/empty.proto";
+//import "google/protobuf/struct.proto";
+//import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/field_mask.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/api/client.proto";
+import "google/api/resource.proto";
+
+
+import "omas/type/order.proto";
+import "omas/type/fulfillment.proto";
+
+option csharp_namespace = "Omas.Protos.V1";
+
+
+service OmasOrderService {
+
+	//submit and charge order 
+	rpc PlaceOrder(PlaceOrderRequest) returns (PlaceOrderResponse) {
+		option (google.api.http) = { 
+			post: "/v1/{parent=vendors/*}:placeOrder"
+			body: "*"
+		};
+		option (google.api.method_signature) = "parent";
+	}
+
+	//acknowledge, accept or decline order
+	rpc ConfirmOrder(ConfirmOrderRequest) returns (omas.type.Fulfillment) {
+		option (google.api.http) = { 
+			post: "/v1/{name=vendors/*/orders/*}:confirm"
+			body: "*"
+		};
+		option (google.api.method_signature) = "name";
+	}
+
+	//advance order process state: sourcing, assembly, picking & packaging 
+	rpc ProcessOrder(ProcessOrderRequest) returns (omas.type.Fulfillment) {
+		option (google.api.http) = { 
+			post: "/v1/{name=vendors/*/orders/*}:process"
+			body: "*"
+		};
+		option (google.api.method_signature) = "name";
+	}
+
+	//advance order delivery state: shipment & delivery
+	rpc DeliverOrder(DeliverOrderRequest) returns (omas.type.Fulfillment) {
+		option (google.api.http) = { 
+			post: "/v1/{name=vendors/*/orders/*}:deliver"
+			body: "*"
+		};
+		option (google.api.method_signature) = "name";
+	}
+
+	//finalize order state
+	rpc CompleteOrder(CompleteOrderRequest) returns (omas.type.Fulfillment) {
+		option (google.api.http) = { 
+			post: "/v1/{name=vendors/*/orders/*}:complete"
+			body: "*"
+		};
+		option (google.api.method_signature) = "name";
+	}
+
+	//get modified orders 
+	rpc PollOrders(PollOrdersRequest) returns (PollOrdersResponse) {
+		option (google.api.http) = { 
+			get: "/v1/{parent=vendors/*}/orders:poll" 
+		};
+		option (google.api.method_signature) = "parent";
+	}
+
+	//stream modified orders 
+	rpc MonitorOrders(MonitorOrdersRequest) returns (stream OrderReply) {
+		option (google.api.http) = { 
+			get: "/v1/{parent=vendors/*}/orders:monitor" 
+		};
+		option (google.api.method_signature) = "parent";
+	}
+
+	/* standard methods */
+
+	//get order (AIP-131)
+	rpc GetOrder(GetOrderRequest) returns (omas.type.Fulfillment) {
+		option (google.api.http) = { 
+			get: "/v1/{name=vendors/*/orders/*}"
+		};
+		option (google.api.method_signature) = "name";
+	}
+
+	//list orders (AIP-134)
+	rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse) {
+		option (google.api.http) = { 
+			get: "/v1/{parent=vendors/*}/orders" 
+		};
+		option (google.api.method_signature) = "parent";
+	}
+
+	//update order (AIP-132)
+	rpc UpdateOrder(UpdateOrderRequest) returns (omas.type.Fulfillment) {
+		option (google.api.http) = { 
+			patch: "/v1/{fulfillment.name=vendors/*/orders/*}",
+			body: "fulfillment"
+		};
+		option (google.api.method_signature) = "fulfillment,update_mask";
+	}	
+}
+
+message PlaceOrderRequest {
+
+	// Format: vendors/{vendor}
+	string parent = 1 [
+		(google.api.field_behavior) = REQUIRED,
+		(google.api.resource_reference) = {
+			child_type: "omas.type/Order"
+		}];
+
+	omas.type.Order order = 5;
+	string status_url = 6;
+	//todo client
+}
+
+message PlaceOrderResponse {
+	//todo resource name
+
+	omas.type.Order order = 5;
+	string pay_url = 6;
+}
+
+message ConfirmOrderRequest {
+
+  // the name of order to acknowledge
+  // Format: vendors/{vendor}/orders/{order}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Fulfillment"
+    }];
+
+	oneof content {
+		//none: acknowledge receive
+		google.protobuf.Empty acknowledge = 5 [json_name="ack"];
+
+		//accept order
+		Accept accept = 6;
+
+		//decline reason
+		string decline = 7; 
+	}
+
+	message Accept {
+		//packaging time estimate
+		google.protobuf.Timestamp packaging_time = 5; 
+
+		//delivery time estimate
+		google.protobuf.Timestamp delivery_time = 6;
+	}
+}
+
+message ProcessOrderRequest {
+
+  // the name of order to process
+  // Format: vendors/{vendor}/orders/{order}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Fulfillment"
+    }];
+
+	oneof content {
+		//none: processing
+		omas.type.Sourcing sourcing = 6;
+		omas.type.Assembly assembly = 7;
+		omas.type.Packaging packaging = 8;
+	}
+
+	bool completed = 15; //step completed
+}
+
+message DeliverOrderRequest {
+
+  // the name of order to acknowledge
+  // Format: vendors/{vendor}/orders/{order}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Fulfillment"
+    }];
+
+	oneof content {
+		//none 
+		omas.type.Shipment shipment = 6;
+		omas.type.Delivery delivery = 7;
+	}
+
+	bool completed = 15; //step completed
+}
+
+message CompleteOrderRequest {
+
+  // the name of order to acknowledge
+  // Format: vendors/{vendor}/orders/{order}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Fulfillment"
+    }];
+
+	oneof content {
+		//none: completing
+		omas.type.Settlement settlement = 6;
+
+		string cancel = 11; //cancelation reason
+	}
+}
+
+
+message GetOrderRequest {
+
+  // The name of the order to retrieve.
+  // Format: vendors/{vendor}/orders/{order}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Fulfillment"
+    }];
+}
+
+message ListOrdersRequest {	
+
+	// The parent, which owns this collection of orders.
+	// Format: vendors/{vendor}
+	string parent = 1 [
+		(google.api.field_behavior) = REQUIRED,
+		(google.api.resource_reference) = {
+			child_type: "omas.type/Fulfillment"
+		}];
+
+	int32  page_size = 2; // Default 50, Maximum 1000; 
+	string page_token = 3;
+
+	//todo string filter see: https://google.aip.dev/160 
+	//todo string order_by https://google.aip.dev/132#ordering
+	//todo show_deleted https://google.aip.dev/132#soft-deleted-resources
+}
+
+message ListOrdersResponse {
+
+	repeated omas.type.Fulfillment fulfillments = 1;
+
+	//maybe int32 total_size = 2;
+	string next_page_token = 3;	
+
+	//unreachable https://google.aip.dev/217
+	repeated string unreachable = 4 [
+		(google.api.field_behavior) = UNORDERED_LIST
+	];
+}
+
+message UpdateOrderRequest {
+
+	// The order to update.
+	//
+	// The fulfillment's `name` field is used to identify the order to be updated.
+	// Format: vendors/{vendor}/orders/{order}
+	omas.type.Fulfillment fulfillment = 1 [(google.api.field_behavior) = REQUIRED];	
+
+	// The list of fields to be updated. (repeated fields are replaced)
+	google.protobuf.FieldMask update_mask = 2;
+}
+
+
+message PollOrdersRequest {
+
+	//The parent, which owns the orders.
+	//Format: vendors/{vendor}
+	string parent = 1 [
+		(google.api.field_behavior) = REQUIRED,
+		(google.api.resource_reference) = {
+			child_type: "omas.type/Fulfillment"
+		}];	
+		
+	
+	//The page size
+	//Default: 50
+	//Maximum: 1000
+	int32  page_size = 2;
+	string page_token = 3;
+
+	//long poll timeout 
+	//Default: 30s
+	google.protobuf.Duration timeout = 4;
+
+	google.protobuf.Timestamp start_time = 7;
+
+	//todo string filter see: https://google.aip.dev/160
+	//todo show_deleted https://google.aip.dev/132#soft-deleted-resources
+}
+
+message PollOrdersResponse {
+	repeated omas.type.Fulfillment fulfillments = 1;
+
+	//maybe int32 pending_count = 2;
+	string next_page_token = 3;
+}
+
+message MonitorOrdersRequest {
+
+	//The parent, which owns the orders.
+	//Format: vendors/{vendor}
+	string parent = 1 [
+		(google.api.field_behavior) = REQUIRED,
+		(google.api.resource_reference) = {
+			child_type: "omas.type/Fulfillment"
+		}];	
+			
+	uint64 start_sequence = 2 [json_name="startSeq"];
+	google.protobuf.Timestamp start_time = 3;
+
+	//pulse interval 
+	//Default: 50s
+	google.protobuf.Duration keep_alive = 7;
+
+	//todo filters;
+	//todo mode last, new, limit
+	//todo views 
+}
+
+message OrderReply {	
+	uint64 sequence = 1 [json_name="seq"];
+	google.protobuf.Timestamp timestamp = 2 [json_name="ts"];
+
+	omas.type.Fulfillment fulfillment = 5;
+}

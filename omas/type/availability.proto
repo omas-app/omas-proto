@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/struct.proto";
+import "google/type/dayofweek.proto";
+import "google/type/timeofday.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+
+message AvailabilityTime {
+	repeated google.type.DayOfWeek days = 1;
+	google.protobuf.BoolValue holiday = 2;
+	google.type.TimeOfDay from_time = 3;
+	google.type.TimeOfDay to_time = 4;
+}
+
+

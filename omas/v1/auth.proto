@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package omas.v1;
+
+//import "google/protobuf/empty.proto";
+//import "google/protobuf/struct.proto";
+//import "google/protobuf/wrappers.proto";
+//import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "Omas.Protos.V1";
+
+
+service OmasAuthService {
+	rpc Register(RegisterRequest) returns (RegisterResponse);
+}
+
+
+message RegisterRequest {
+	string name = 5 [json_name="n"];
+	string subject = 6 [json_name="sub"];
+
+	oneof challenge {
+		//google.protobuf.Value value = 15;
+		string token = 16;
+	}
+
+	//todo location
+}
+
+message RegisterResponse {
+	string token = 5;
+}

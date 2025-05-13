@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/struct.proto";
+
+import "omas/type/tenant.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+message User {
+	string id = 1;
+
+	string display_name = 3 [json_name="n"];
+
+	map<string, google.protobuf.Value> attributes = 10 [json_name="atts"];
+
+	Tenant tenant = 15 [json_name="tn"];
+
+	google.protobuf.Value metadata = 25 [json_name="meta"];
+}
