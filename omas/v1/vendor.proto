@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package omas.v1;
+
+
+//import "google/protobuf/empty.proto";
+//import "google/protobuf/struct.proto";
+//import "google/protobuf/wrappers.proto";
+//import "google/protobuf/timestamp.proto";
+//import "google/protobuf/duration.proto";
+import "google/protobuf/field_mask.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/api/client.proto";
+import "google/api/resource.proto";
+
+import "omas/type/vendor.proto";
+
+option csharp_namespace = "Omas.Protos.V1";
+
+service OmasVendorService {
+
+	//import vendor data
+	rpc ImportVendor(ImportVendorRequest) returns (ImportVendorResponse) {
+		option (google.api.http) = { 
+			post: "/v1/{name=vendors/*}:import"
+			body: "*"
+		};
+		option (google.api.method_signature) = "name";
+	}
+
+	/* standard methods */
+
+	//get order (AIP-131)
+	rpc GetVendor(GetVendorRequest) returns (omas.type.Vendor) {
+		option (google.api.http) = { 
+			get: "/v1/{name=vendors/*}"
+		};
+		option (google.api.method_signature) = "name";
+	}
+
+	//list orders (AIP-134)
+	rpc ListVendors(ListVendorsRequest) returns (ListVendorsResponse) {
+		option (google.api.http) = { 
+			get: "/v1/vendors" 
+		};
+		//option (google.api.method_signature) = "";
+	}
+
+	//update order (AIP-132)
+	rpc UpdateVendor(UpdateVendorRequest) returns (omas.type.Vendor) {
+		option (google.api.http) = { 
+			patch: "/v1/{vendor.name=vendors/*}",
+			body: "vendor"
+		};
+		option (google.api.method_signature) = "vendor,update_mask";
+	}	
+}
+
+
+message ImportVendorRequest {
+
+	// Format: vendors/{vendor}
+	string name = 1 [
+		(google.api.field_behavior) = REQUIRED,
+		(google.api.resource_reference) = {
+		  type: "omas.type/Vendor"
+    }];
+
+	//google.protobuf.FieldMask update_mask = 2;
+
+	//source url
+	string source = 5;
+}
+
+message ImportVendorResponse {
+
+	//todo some jop reference for prorgerss
+}
+
+
+message GetVendorRequest {
+
+  // The name of the vendor to retrieve.
+  // Format: vendors/{vendor}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Vendor"
+    }];
+}
+
+message ListVendorsRequest {	
+
+	int32  page_size = 2; // Default 50, Maximum 1000; 
+	string page_token = 3;
+
+	//todo string filter see: https://google.aip.dev/160 
+	//todo string order_by https://google.aip.dev/132#ordering
+	//todo show_deleted https://google.aip.dev/132#soft-deleted-resources
+}
+
+message ListVendorsResponse {
+
+	repeated omas.type.Vendor vendors = 1;
+
+	//maybe int32 total_size = 2;
+	string next_page_token = 3;	
+
+	//unreachable https://google.aip.dev/217
+	repeated string unreachable = 4 [
+		(google.api.field_behavior) = UNORDERED_LIST
+	];
+}
+
+message UpdateVendorRequest {
+
+	// The vendor to update.
+	//
+	// The vendor's `name` field is used to identify the vendor to be updated.
+	// Format: vendors/{vendor}
+	omas.type.Vendor vendor = 1 [(google.api.field_behavior) = REQUIRED];	
+
+	// The list of fields to be updated. (repeated fields are replaced)
+	google.protobuf.FieldMask update_mask = 2;
+}
