@@ -27,13 +27,13 @@ message Vendor {
 	};
 
 	string id = 1;
-	string slug = 2  [json_name="s"];
+	string slug = 2;
 
 	//resource name: vendors/{vendor}
 	string name = 3  [(google.api.field_behavior) = IDENTIFIER]; 
 
-	string  display_name = 5  [json_name="n"];
-	Info    info = 6  [json_name="i"];
+	string  display_name = 5  [json_name="label"];
+	Info    info = 6;
 	Contact owner = 7;
 
 	repeated Location locations = 11 [json_name="loc"];
@@ -63,6 +63,6 @@ message Vendor {
 }
 
 message Rating {
-	double value = 1  [json_name="v"];
+	double value = 1  [json_name="val"];
 	int32 count = 2;
 }

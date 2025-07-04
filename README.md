@@ -29,31 +29,21 @@ dotnet-grpc add-url $url --project src/Omas.Client --output $proto
 ### short forms
 
 - name:resource_name
-- n:display_name
+- label:display_name
 - cn:common_name
-- s?slug,sender
-- r:receiver
 - fid:foreign_id
-- k:key
 - sub:subject
 - nr:number
-- o:option
-- i:info
-- v:value
-- vn:vendor
-- tn:tenant
-- u:user
+- opt:option
+- val:value
 - desc:description
 - attr:attribute
 - atts:attributes
 - ts:timestamp
 - msg:message
 - meta:metadata
-- c:contact
-- a:amount
 - ccy:currency
-- q:quantity
-- t:total
+- qty:quantity
 - rev:revision
 - seq:sequence
 - hdr:header
@@ -67,7 +57,29 @@ dotnet-grpc add-url $url --project src/Omas.Client --output $proto
 - thumbs:thumbnails
 - del:deleted
 - sort:sort_order
-- p:price
+- pr:price
 - sel:selectors
-- f:filter
+- flt:filter
 - excl:exclusions
+
+### legacy short forms
+
+because of some tooling short comings, 
+single char property names are not benificial.
+
+- n:display_name => label
+- s:slug,sender
+- r:receiver
+- k:key
+- o:option => opt
+- i:info
+- v:value => val
+- vn:vendor
+- tn:tenant
+- u:user
+- c:contact
+- a:amount
+- q:quantity => qty
+- t:total
+- p:price => pr
+- f:filter => flt

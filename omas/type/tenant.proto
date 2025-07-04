@@ -8,8 +8,8 @@ option csharp_namespace = "Omas.Protos";
 
 message Tenant {
 	string id = 1;	
-	string slug = 2 [json_name="s"];
-	string display_name = 3 [json_name="n"];	
+	string slug = 2;
+	string display_name = 3 [json_name="label"];	
 
 	google.protobuf.Value metadata = 25 [json_name="meta"];
 }

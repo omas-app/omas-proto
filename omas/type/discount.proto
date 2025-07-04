@@ -12,11 +12,11 @@ option csharp_namespace = "Omas.Protos";
 
 message Discount {
 	
-	string slug = 2 [json_name="s"];
+	string slug = 2;
 
-	string display_name = 5 [json_name="n"];
+	string display_name = 5 [json_name="label"];
 
-	repeated Filter filters = 6 [json_name="f"];
+	repeated Filter filters = 6 [json_name="flt"];
 
 	double amount_total = 10;
 	double amount_piece =  11;
@@ -28,7 +28,7 @@ message Discount {
 		repeated string selectors = 5 [json_name="sel"]; //tag or path: cat-a/cat-b/product-1
 	
 		double amount = 7; //min amount
-		int32  quantity = 8 [json_name="q"]; //min quantity
+		int32  quantity = 8 [json_name="qty"]; //min quantity
 	
 		repeated DeliveryZone delivery_zones = 10;
 		repeated AvailabilityTime availability_time = 11;
@@ -37,9 +37,9 @@ message Discount {
 	}
 
 	message Item {
-		string slug = 2 [json_name="s"];
-		string name = 5 [json_name="n"];
+		string slug = 2;
+		string name = 5 [json_name="label"];
 		repeated string selectors = 6 [json_name="sel"]; //tag or path: cat-a/cat-b/product-1
-		int32 quantity = 7 [json_name="q"];		
+		int32 quantity = 7 [json_name="qty"];		
 	}
 }

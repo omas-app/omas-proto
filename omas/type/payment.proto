@@ -14,12 +14,12 @@ message Payment {
 	string system = 5 [json_name="sys"];
 	string method = 6;
 	State  state = 7;
-	string sender = 8 [json_name="s"];
-	string receiver = 9 [json_name="r"];
+	string sender = 8;
+	string receiver = 9;
 	string foreign_id = 10 [json_name="fid"];
 	string description = 11 [json_name="desc"];
 	string currency = 12 [json_name="ccy"];
-	double amount = 13 [json_name="a"];
+	double amount = 13;
 
 	google.protobuf.Value metadata = 25 [json_name="meta"];
 

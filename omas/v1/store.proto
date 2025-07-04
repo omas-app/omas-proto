@@ -23,7 +23,7 @@ service OmasStoreService {
 }
 
 message MonitorStoreRequest {
-	repeated string filters = 5;
+	repeated string filters = 5 [json_name="flts"];
 	uint64 start_sequence = 6 [json_name="startSeq"];
 	google.protobuf.Timestamp start_time = 7;
 	//todo delivery_policy mode change stream vs single

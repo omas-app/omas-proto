@@ -11,11 +11,11 @@ option csharp_namespace = "Omas.Protos";
 message User {
 	string id = 1;
 
-	string display_name = 3 [json_name="n"];
+	string display_name = 3 [json_name="label"];
 
 	map<string, google.protobuf.Value> attributes = 10 [json_name="atts"];
 
-	Tenant tenant = 15 [json_name="tn"];
+	Tenant tenant = 15;
 
 	google.protobuf.Value metadata = 25 [json_name="meta"];
 }

@@ -9,11 +9,10 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/field_mask.proto";
 import "google/api/annotations.proto"; 
 
-
-import "omas/type/tenant.proto";
+//import "omas/type/tenant.proto";
 import "omas/type/vendor.proto";
 import "omas/type/user.proto";
-import "omas/type/order.proto";
+//import "omas/type/order.proto";
 import "omas/type/fulfillment.proto";
 
 option csharp_namespace = "Omas.Protos.V1";
@@ -28,7 +27,7 @@ service OmasStreamService {
 }
 
 message MonitorStreamRequest {
-	repeated string filters = 5;
+	repeated string filters = 5 [json_name="flts"];
 	uint64 start_sequence = 6 [json_name="startSeq"];
 	google.protobuf.Timestamp start_time = 7;
 	//todo delivery_policy mode change stream vs single

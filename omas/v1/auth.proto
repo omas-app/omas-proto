@@ -16,7 +16,7 @@ service OmasAuthService {
 
 
 message RegisterRequest {
-	string name = 5 [json_name="n"];
+	string display_name = 5 [json_name="label"];
 	string subject = 6 [json_name="sub"];
 
 	oneof challenge {

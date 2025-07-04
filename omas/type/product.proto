@@ -27,10 +27,11 @@ message Product {
 
 	string name = 3  [(google.api.field_behavior) = IDENTIFIER]; 
 
-	string display_name = 5  [json_name="n"];
-	Info   info = 6  [json_name="i"];
+	string display_name = 5  [json_name="label"];
+	Info   info = 6;
+	repeated string tags = 7;
 
-	double price = 11; //incl. vat
+	double price = 11 [json_name="pr"]; //incl. vat
 	google.protobuf.DoubleValue vat_p = 12; //percent
 
 	repeated ProductOption options = 14  [json_name="opts"];
@@ -59,9 +60,9 @@ message Product {
 }
 
 message ProductOption {
-	string slug = 2  [json_name="s"];
+	string slug = 2;
 
-	string name = 5  [json_name="n"];
+	string name = 5  [json_name="label"];
 	int32 range_min = 6  [json_name="min"]; //min total selections
 	int32 range_max = 7  [json_name="max"]; //max total selections
 	int32 range_max_quantity = 8 [json_name="maxQ"]; //max quantity
@@ -70,21 +71,21 @@ message ProductOption {
 	repeated Value values = 10  [json_name="vals"];
 
 	message Value {
-		string slug = 2  [json_name="s"];
+		string slug = 2;
 	
-		string name = 5  [json_name="n"];
+		string name = 5  [json_name="label"];
 	
-		double price = 11  [json_name="p"];
+		double price = 11 [json_name="pr"];
 	}
 }
 
 
 message ProductGroup {
 
-	string slug = 2  [json_name="s"];
+	string slug = 2 ;
 
-	string name = 5  [json_name="n"];
-	Info info = 6    [json_name="i"];
+	string name = 5  [json_name="label"];
+	Info info = 6;
 	
 	repeated Product products = 10;
 	repeated ProductOption options = 11  [json_name="opts"];

@@ -14,7 +14,6 @@ import "omas/type/delivery.proto";
 import "omas/type/discount.proto";
 import "omas/type/payment.proto";
 import "omas/type/product.proto";
-import "omas/type/vendor.proto";
 
 option csharp_namespace = "Omas.Protos";
 
@@ -26,7 +25,6 @@ message Order {
 	google.protobuf.Timestamp create_time = 3  [json_name="cts"];
 	
 	string vendor = 4 [
-		json_name = "vn",
 		(google.api.field_behavior) = REQUIRED,
 		(google.api.resource_reference) = {
 			type: "omas.type/Vendor"
@@ -38,7 +36,7 @@ message Order {
 	DeliveryInfo delivery = 7;
 	Payment payment = 8;
 	
-	Amount amount = 10 [json_name="a"];
+	Amount amount = 10;
 	map<string, double> vat_a = 11;		//vat amounts: 0%: 2.00, 10%: 10.70, 20%: 2.55
 
 	repeated OrderLine lines = 15;
@@ -47,13 +45,13 @@ message Order {
 
 	message Amount {
 		string currency = 1 [json_name="ccy"];
-		double value = 2 [json_name="v"]; //sub total
+		double value = 2 [json_name="val"]; //sub total
 		//double shipping_cost = 3; //shipping has vat 10 or 20 depending on products
 		//double discount = 4;		
 		map<string, double> charges = 5; //shipping cost, service fee, reusable deposit
 		map<string, double> discounts = 7; //onlinebonus, 10% Discount
 
-		double total = 10 [json_name="t"];		 
+		double total = 10;		 
 	}
 }
 
@@ -63,10 +61,10 @@ message OrderLine {
 	Entry entry = 5;
 	repeated Entry addons = 6;
 	
-	int32 quantity = 8 [json_name="q"];
+	int32 quantity = 8 [json_name="qty"];
 
 	google.protobuf.DoubleValue vat_a = 11; //vat amount
-	double total = 12 [json_name="t"]; //incl. vat
+	double total = 12; //incl. vat
 
 	Discount discount = 13; //discount reference
 
@@ -83,9 +81,9 @@ message OrderLine {
 
 		EntryType type = 3; //default to artikel
 
-		string name = 5 [json_name="n"];
+		string name = 5 [json_name="label"];
 		string description = 6 [json_name="desc"];
-		double price = 7; //incl. vat		
+		double price = 7 [json_name="pr"]; //incl. vat		
 		google.protobuf.DoubleValue vat_p = 8; //vat percent
 
 		string product_id = 13 [

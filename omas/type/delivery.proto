@@ -27,7 +27,7 @@ message DeliveryInfo {
 
 message DeliveryZone {
 
-	string display_name = 2  [json_name="n"]; //name
+	string display_name = 2  [json_name="label"]; //name
 
 	string postal_code = 5;
 	//todo country_code

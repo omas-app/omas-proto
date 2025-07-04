@@ -8,7 +8,7 @@ option csharp_namespace = "Omas.Protos";
 
 message Contact {
 	
-	string display_name = 5 [json_name="n"];
+	string display_name = 5 [json_name="label"];
 	string email = 6;
 	string phone = 7;
 	string postal_address = 8 [json_name="postalAddr"];

@@ -13,7 +13,7 @@ message Resource {
 	//todo define stanalone resource
 
 	string id = 1;
-	string display_name = 2 [json_name="n"]; //file name
+	string display_name = 2 [json_name="label"]; //file name
 	string type = 3; //content type as mime
 	int32  size = 4; //content size in bytes
 
