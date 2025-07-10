@@ -4,7 +4,7 @@ package omas.type;
 
 import "google/protobuf/struct.proto";
 
-import "omas/type/tenant.proto";
+//import "omas/type/tenant.proto";
 import "omas/type/user.proto";
 import "omas/type/vendor.proto";
 

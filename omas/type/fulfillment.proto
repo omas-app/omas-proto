@@ -118,6 +118,9 @@ message Delivery {
 	
 	//delivery time or estimate
 	google.protobuf.Timestamp time = 7;
+
+	//driver reference
+	string driver_id = 8;
 }
 
 message Cancelation {

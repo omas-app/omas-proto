@@ -86,12 +86,12 @@ message OrderLine {
 		double price = 7 [json_name="pr"]; //incl. vat		
 		google.protobuf.DoubleValue vat_p = 8; //vat percent
 
+		//Product id or number
 		string product_id = 13 [
 			(google.api.resource_reference) = {
 				type: "omas.type/Product"
 			}];
 
-		//Product legacy_product = 14;
 		repeated ProductOption options = 15 [json_name="opts"];
 
 		enum EntryType {

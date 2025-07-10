@@ -39,8 +39,6 @@ message DeliveryZone {
 	double service_fee = 12; //incl. vat
 	double service_fee_max = 13; //min price for free delivery 
 
-	//todo delivery time
-
 	repeated AvailabilityTime availability_time = 15;
 
 	message Radius {

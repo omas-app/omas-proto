@@ -82,7 +82,9 @@ message ProductOption {
 
 message ProductGroup {
 
-	string slug = 2 ;
+	//product group path
+	//format: delivery/pizza/family
+	string slug = 2;
 
 	string name = 5  [json_name="label"];
 	Info info = 6;
