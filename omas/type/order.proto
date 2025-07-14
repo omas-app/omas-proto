@@ -20,7 +20,8 @@ option csharp_namespace = "Omas.Protos";
 message Order {
 	reserved 5;
 
-	string id = 1; //uid
+	//uuid
+	string id = 1; 
 	string number = 2 [json_name="nr"]; //order number (not unique)
 	google.protobuf.Timestamp create_time = 3  [json_name="cts"];
 	

@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/struct.proto";
+
+//import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+message Printer {
+	option (google.api.resource) = {
+		type: "omas.type/Printer"
+		pattern: "printers/{printer}"
+		singular: "printer"
+		plural: "printers"
+	};
+
+	string id = 1;
+	//string slug = 2;
+
+	//resource name: printers/{printer}
+	string name = 3  [(google.api.field_behavior) = IDENTIFIER]; 
+
+	string  display_name = 5  [json_name="label"];
+	Info    info = 6;
+	
+	google.protobuf.Value metadata = 25  [json_name="meta"];	
+
+	message Info {
+
+		map<string, google.protobuf.Value> attributes = 15  [json_name="atts"];
+	}
+}
+
+
+message PrintJob {
+    option (google.api.resource) = {
+		type: "omas.type/PrintJob"
+		pattern: "printers/{printer}/jobs/{printJob}"
+		singular: "printJob"
+		plural: "printJobs"
+	};
+
+    //uuid
+    string id = 1;
+
+    //resource name: printers/{printer}/jobs/{printJob}
+    string name = 2  [(google.api.field_behavior) = IDENTIFIER];
+
+    string printer = 4 [
+        (google.api.field_behavior) = REQUIRED,
+        (google.api.resource_reference) = {
+            type: "omas.type/Printer"
+        }];
+}

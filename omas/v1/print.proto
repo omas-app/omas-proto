@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package omas.v1;
+
+//import "google/protobuf/empty.proto";
+//import "google/protobuf/struct.proto";
+//import "google/protobuf/wrappers.proto";
+//import "google/protobuf/timestamp.proto";
+//import "google/protobuf/duration.proto";
+//import "google/protobuf/field_mask.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/api/client.proto";
+import "google/api/resource.proto";
+import "google/longrunning/operations.proto";
+
+import "omas/type/print.proto";
+
+option csharp_namespace = "Omas.Protos.V1";
+
+service OmasPrintService {
+
+	//submit and charge order 
+	rpc Print(PrintRequest) returns (google.longrunning.Operation) {
+		option (google.api.http) = { 
+			post: "/v1/{parent=printer/*}:print"
+			body: "*"
+		};
+		option (google.api.method_signature) = "parent";
+        option (google.longrunning.operation_info) = {
+            response_type: "omas.type/PrintJob"
+            metadata_type: "omas.type/PrintJobMetadata"
+        };
+	}
+
+    /* standard methods */
+
+	//get order (AIP-131)
+	rpc GetPrinter(GetPrinterRequest) returns (omas.type.Printer) {
+		option (google.api.http) = { 
+			get: "/v1/{name=printers/*}"
+		};
+		option (google.api.method_signature) = "name";
+	}
+
+    //list orders (AIP-134)
+	rpc ListPrinters(ListPrintersRequest) returns (ListPrintersResponse) {
+		option (google.api.http) = { 
+			get: "/v1/printers" 
+		};
+		//option (google.api.method_signature) = "";
+	}
+}
+
+message PrintRequest {
+
+	// Format: vendors/{vendor}
+	string parent = 1 [
+		(google.api.field_behavior) = REQUIRED,
+		(google.api.resource_reference) = {
+			child_type: "omas.type/Printer"
+		}];
+
+	//omas.type.Order order = 5;
+	//string status_url = 6;
+}
+
+message GetPrinterRequest {
+
+  // The name of the printer to retrieve.
+  // Format: printers/{printer}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Printer"
+    }];
+}
+
+message ListPrintersRequest {	
+
+	int32  page_size = 2; // Default 50, Maximum 1000; 
+	string page_token = 3;
+
+	//todo string filter see: https://google.aip.dev/160 
+	//todo string order_by https://google.aip.dev/132#ordering
+	//todo show_deleted https://google.aip.dev/132#soft-deleted-resources
+}
+
+message ListPrintersResponse {
+
+	repeated omas.type.Printer printer = 1;
+
+	//maybe int32 total_size = 2;
+	string next_page_token = 3;	
+
+	//unreachable https://google.aip.dev/217
+	repeated string unreachable = 4 [
+		(google.api.field_behavior) = UNORDERED_LIST
+	];
+}
