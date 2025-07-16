@@ -30,6 +30,8 @@ message Printer {
 	google.protobuf.Value metadata = 25  [json_name="meta"];	
 
 	message Info {
+        //the announced name of the driver or model        
+        string driver_name = 1;
 
 		map<string, google.protobuf.Value> attributes = 15  [json_name="atts"];
 	}
@@ -55,4 +57,21 @@ message PrintJob {
         (google.api.resource_reference) = {
             type: "omas.type/Printer"
         }];
+
+    //label of print job
+    string display_name = 5 [json_name="label"];
+    
+    //count of duplicates to print
+    //default: 1
+    int32  copies = 6;
+
+    oneof content {
+        //content url
+        string url = 10; 
+        bytes data = 11;
+
+        //todo extend with template engine
+    }
+
+    //todo add custom print settings
 }

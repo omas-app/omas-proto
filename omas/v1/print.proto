@@ -20,22 +20,22 @@ option csharp_namespace = "Omas.Protos.V1";
 
 service OmasPrintService {
 
-	//submit and charge order 
-	rpc Print(PrintRequest) returns (google.longrunning.Operation) {
+    /* standard methods */
+
+    //create print job (AIP-133)
+    rpc CreatePrintJob(CreatePrintJobRequest) returns (google.longrunning.Operation) {
 		option (google.api.http) = { 
-			post: "/v1/{parent=printer/*}:print"
-			body: "*"
+			post: "/v1/{parent=printer/*}/jobs"
+			body: "job"
 		};
-		option (google.api.method_signature) = "parent";
+		//option (google.api.method_signature) = "parent,job";
         option (google.longrunning.operation_info) = {
             response_type: "omas.type/PrintJob"
             metadata_type: "omas.type/PrintJobMetadata"
         };
 	}
 
-    /* standard methods */
-
-	//get order (AIP-131)
+	//get printer (AIP-131)
 	rpc GetPrinter(GetPrinterRequest) returns (omas.type.Printer) {
 		option (google.api.http) = { 
 			get: "/v1/{name=printers/*}"
@@ -43,7 +43,7 @@ service OmasPrintService {
 		option (google.api.method_signature) = "name";
 	}
 
-    //list orders (AIP-134)
+    //list printers (AIP-134)
 	rpc ListPrinters(ListPrintersRequest) returns (ListPrintersResponse) {
 		option (google.api.http) = { 
 			get: "/v1/printers" 
@@ -52,7 +52,7 @@ service OmasPrintService {
 	}
 }
 
-message PrintRequest {
+message CreatePrintJobRequest {
 
 	// Format: vendors/{vendor}
 	string parent = 1 [
@@ -61,8 +61,8 @@ message PrintRequest {
 			child_type: "omas.type/Printer"
 		}];
 
-	//omas.type.Order order = 5;
-	//string status_url = 6;
+    string job_id = 2;
+    omas.type.PrintJob job = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 message GetPrinterRequest {
