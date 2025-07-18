@@ -10,9 +10,9 @@ option csharp_namespace = "Omas.Protos";
 
 message Disturbance {	
 	google.protobuf.Timestamp timestamp = 1 [json_name="ts"];
-	//todo end date
-
+	
 	string reason = 5;
+	google.protobuf.Timestamp end_time = 6 [json_name="ets"];
 
 	bool no_pickup = 10;
 	bool no_delivery = 11;
