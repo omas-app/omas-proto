@@ -10,6 +10,7 @@ import "omas/type/vendor.proto";
 
 option csharp_namespace = "Omas.Protos";
 
+// deprecated
 message Identity {
 	oneof content {
 		google.protobuf.Value value = 1;

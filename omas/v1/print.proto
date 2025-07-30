@@ -54,7 +54,7 @@ service OmasPrintService {
 
 message CreatePrintJobRequest {
 
-	// Format: vendors/{vendor}
+	// Format: printers/{printer}
 	string parent = 1 [
 		(google.api.field_behavior) = REQUIRED,
 		(google.api.resource_reference) = {
