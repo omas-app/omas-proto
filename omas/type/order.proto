@@ -125,28 +125,38 @@ message OrderLine {
 	
 	int32 quantity = 8 [json_name="qty"];
 
-	google.protobuf.DoubleValue vat_a = 11; //vat amount
-	double total = 12; //incl. vat
+	//vat amount
+	google.protobuf.DoubleValue vat_a = 11; 
 
-	Discount discount = 13; //discount reference
+	//incl. vat
+	double total = 12; 
+
+	//discount reference
+	Discount discount = 13; 
 
 	//the vendor is not allowed to decrease the quantity to zero
 	bool required = 22; 
 
-	string note = 23; //note of customer
-	//bool optional = 24; //the vendor is allowed to decrease the quantity to zero
+	//note of customer
+	string note = 23; 
 
+	//bool optional = 24; //the vendor is allowed to decrease the quantity to zero
 	//google.protobuf.Value metadata = 25;
 
 	message Entry {
 		reserved 14;
 
-		EntryType type = 3; //default to artikel
+		//default to artikel
+		EntryType type = 3; 
 
 		string name = 5 [json_name="label"];
 		string description = 6 [json_name="desc"];
-		double price = 7 [json_name="pr"]; //incl. vat		
-		google.protobuf.DoubleValue vat_p = 8; //vat percent
+
+		//incl. vat	
+		double price = 7 [json_name="pr"]; 	
+
+		//vat percent
+		google.protobuf.DoubleValue vat_p = 8; 
 
 		//Product id or number
 		string product_id = 13 [
