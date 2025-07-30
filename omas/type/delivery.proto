@@ -14,35 +14,56 @@ option csharp_namespace = "Omas.Protos";
 
 
 message DeliveryInfo {
+
+	// name of the customer
+	string display_name = 4 [json_name="label"]; 
+
 	Location location = 5 [json_name="loc"];
 	string mobile = 6;
-	string note = 7; //note for delivery man
+
+	//note for delivery man
+	string note = 7;
+	
 	bool pick_up = 8;
-	google.protobuf.Timestamp time = 9; //wanted delivery time
+
+	//wanted delivery time
+	google.protobuf.Timestamp time = 9; 
 	string floor = 10;
 	string door = 11;
 	string stair = 12;
-	string house = 13; //house number
+
+	//house number
+	string house = 13;
+
+
 }
 
 message DeliveryZone {
 
-	string display_name = 2  [json_name="label"]; //name
+	//name of zone
+	string display_name = 2  [json_name="label"];
 
 	string postal_code = 5;
+
 	//todo country_code
 	
 	Radius radius = 9;
 
-	double min_price = 10; //incl. vat		
+	//incl. vat	
+	double min_price = 10; 	
 
-	double service_fee = 12; //incl. vat
-	double service_fee_max = 13; //min price for free delivery 
+	//incl. vat
+	double service_fee = 12; 
+	
+	//min price for free delivery 
+	double service_fee_max = 13; 
 
 	repeated AvailabilityTime availability_time = 15;
 
 	message Radius {
 		google.type.LatLng lat_lng = 1;
-		int32 radius = 2; //radius in meter
+
+		// radius in meter
+		int32 radius_meter = 2; 
 	}
 }
