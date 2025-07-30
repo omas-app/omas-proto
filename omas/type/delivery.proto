@@ -35,7 +35,8 @@ message DeliveryInfo {
 	//house number
 	string house = 13;
 
-
+	//used for delivery notifaction
+	string email = 14;
 }
 
 message DeliveryZone {
