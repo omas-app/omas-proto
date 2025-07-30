@@ -8,13 +8,20 @@ import "google/protobuf/timestamp.proto";
 option csharp_namespace = "Omas.Protos";
 
 
-message Disturbance {	
+message Disturbance {
 	google.protobuf.Timestamp timestamp = 1 [json_name="ts"];
 	
+	// example: holiday
 	string reason = 5;
+
 	google.protobuf.Timestamp end_time = 6 [json_name="ets"];
 
-	bool no_pickup = 10;
-	bool no_delivery = 11;
+	bool no_pickup = 10 [deprecated=true];
+	bool no_delivery = 11 [deprecated=true];
+
+	// service with disturbance
+	// listed services should be disabled
+	// example: pickup, delivery
+	repeated string services = 12;
 }
 
