@@ -18,11 +18,13 @@ import "omas/type/product.proto";
 option csharp_namespace = "Omas.Protos";
 
 message Order {
-	reserved 5;
+	reserved 5, 11;
 
-	//uuid
+	//uid
 	string id = 1; 
-	string number = 2 [json_name="nr"]; //order number (not unique)
+
+	//order number (not unique)
+	string number = 2 [json_name="nr"]; 
 	google.protobuf.Timestamp create_time = 3  [json_name="cts"];
 	
 	string vendor = 4 [
@@ -32,27 +34,72 @@ message Order {
 		}];
 
 	//Vendor vendor = 5 [deprecated=true];
-	Identity contact = 6;
+	Identity contact = 6 [deprecated=true];
 
 	DeliveryInfo delivery = 7;
 	Payment payment = 8;
 	
 	Amount amount = 10;
-	map<string, double> vat_a = 11;		//vat amounts: 0%: 2.00, 10%: 10.70, 20%: 2.55
+	
+	//map<string, double> vat_a = 11;
 
+	// The via tells how the order was created. 
+	Via via = 12;
+	
 	repeated OrderLine lines = 15;
 
 	google.protobuf.Value metadata = 25 [json_name="meta"];
 
 	message Amount {
 		string currency = 1 [json_name="ccy"];
-		double value = 2 [json_name="val"]; //sub total
+
+		// sub total
+		// sum of all product lines including vat
+		double value = 2 [json_name="val"];
+
 		//double shipping_cost = 3; //shipping has vat 10 or 20 depending on products
 		//double discount = 4;		
-		map<string, double> charges = 5; //shipping cost, service fee, reusable deposit
-		map<string, double> discounts = 7; //onlinebonus, 10% Discount
 
-		double total = 10;		 
+		// example: shipping cost, service fee, reusable deposit
+		map<string, double> charges = 5; 
+
+		// example: onlinebonus, 10% Discount
+		map<string, double> discounts = 7; 
+
+		// total amount
+		double total = 10;
+
+		// vat amounts 
+		// included value added tax
+		// example: 0%: 2.00, 10%: 10.70, 20%: 2.55
+		map<string, double> vat = 11;
+	}
+
+	message Via {
+
+		// How the order was placed expressed as a via type
+		// example: mobile, mail, web, api, phone, chat
+		string channel = 1;
+
+		// For some channels a source gives more information about how or why the order got placed
+		// example: phone number, email, foreign order reference, ip address
+		string source = 2;
+
+		// name of brand
+		// example: food-express
+		string brand = 5;	
+
+		// name of client application
+		// example: my-app
+		string client_name = 6;
+
+		// sem-ver of client
+		// example: 1.0.0
+		string client_version = 7;
+
+		// locale used in (IETF bcp47)[https://www.rfc-editor.org/rfc/bcp/bcp47.txt]
+		// example: de-DE, en-GB
+		string locale = 8;
 	}
 }
 
