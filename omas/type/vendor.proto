@@ -38,8 +38,13 @@ message Vendor {
 
 	repeated Location locations = 11 [json_name="loc"];
 	string currency = 12  [json_name="ccy"];
-	string type = 13; //food, store
-	repeated string categories = 14  [json_name="cats"]; //Restaurant, Electronics, Appliances & Repair
+	
+	//food, store
+	string type = 13; 
+
+	//Restaurant, Electronics, Appliances & Repair
+	repeated string categories = 14  [json_name="cats"]; 
+
 	repeated string tags = 15;
 	repeated ProductGroup product_groups = 16;
 
@@ -48,7 +53,7 @@ message Vendor {
 
 	Disturbance disturbance = 20;
 
-	google.protobuf.Value metadata = 25  [json_name="meta"];	
+	google.protobuf.Value metadata = 25 [json_name="meta"];	
 
 	message Info {
 		Rating rating = 4;
@@ -57,8 +62,10 @@ message Vendor {
 
 		string website = 10;
 
-		repeated Resource images = 14; //gallery images
-		map<string, google.protobuf.Value> attributes = 15  [json_name="atts"];
+		//gallery images
+		repeated Resource images = 14; 
+
+		map<string, google.protobuf.Value> attributes = 15 [json_name="atts"];
 	}
 }
 

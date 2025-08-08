@@ -77,7 +77,7 @@ message Order {
 
 	message Via {
 
-		// How the order was placed expressed as a via type
+		// How the order was placed
 		// example: mobile, mail, web, api, phone, chat
 		string channel = 1;
 

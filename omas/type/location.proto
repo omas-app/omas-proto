@@ -2,28 +2,34 @@ syntax = "proto3";
 
 package omas.type;
 
-//import "google/protobuf/struct.proto";
+import "google/protobuf/struct.proto";
 import "google/type/latlng.proto";
 
 import "omas/type/availability.proto";
-import "omas/type/disturbance.proto";
+//import "omas/type/disturbance.proto";
 
 option csharp_namespace = "Omas.Protos";
 
 message Location {
 	string display_name = 1  [json_name="label"];
+
+	//address excluding postal and city 
 	repeated string address_lines = 2 [json_name="addrLines"];
+		
 	string country_code = 3;
 	string postal_code = 4;
 	string city = 5;
 
-	string formatted = 7; //multiline postal address with name and address  
+	//multiline postal address with name and address  
+	string formatted = 7; 
 
 	google.type.LatLng  lat_lng = 11;
 
-	repeated AvailabilityTime open_hours = 14;
+	repeated AvailabilityTime availability_times = 14;
+
+	map<string, google.protobuf.Value> attributes = 15 [json_name="atts"];
 
 	//todo delivery_zones
 
-	Disturbance disturbance = 20;
+	//Disturbance disturbance = 20;
 }

@@ -59,7 +59,7 @@ message DeliveryZone {
 	//min price for free delivery 
 	double service_fee_max = 13; 
 
-	repeated AvailabilityTime availability_time = 15;
+	repeated AvailabilityTime availability_times = 15;
 
 	message Radius {
 		google.type.LatLng lat_lng = 1;

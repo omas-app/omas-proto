@@ -141,6 +141,6 @@ enum ActorType {
 	SYSTEM = 1; //automation
 	TENANT = 2; //portal
 	VENDOR = 3; //vendor
-	USER = 4; //user
+	USER = 4;   //user
 }
 
