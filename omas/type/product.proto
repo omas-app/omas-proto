@@ -63,10 +63,22 @@ message ProductOption {
 	string slug = 2;
 
 	string name = 5  [json_name="label"];
-	int32 range_min = 6  [json_name="min"]; //min total selections
-	int32 range_max = 7  [json_name="max"]; //max total selections
-	int32 range_max_quantity = 8 [json_name="maxQ"]; //max quantity
-	int32 range_free = 9 [json_name="free"]; //free count
+
+	//min total selections
+	//default: 0
+	int32 range_min = 6  [json_name="min"]; 
+
+	//max total selections
+	//default: 1
+	int32 range_max = 7  [json_name="max"]; 
+
+	//max quantity per option
+	//default: 1
+	int32 range_max_quantity = 8 [json_name="maxQ"]; 
+
+	//free count
+	//default: 0
+	int32 range_free = 9 [json_name="free"]; 
 	
 	repeated Value values = 10  [json_name="vals"];
 
@@ -76,6 +88,10 @@ message ProductOption {
 		string name = 5  [json_name="label"];
 	
 		double price = 11 [json_name="pr"];
+
+		//selected quantity
+		//default: 1
+		int32 quantity = 12 [json_name="qty"];
 	}
 }
 

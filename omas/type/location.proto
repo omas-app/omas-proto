@@ -26,7 +26,7 @@ message Location {
 	google.type.LatLng  lat_lng = 11;
 
 	repeated AvailabilityTime availability_times = 14;
-
+	
 	map<string, google.protobuf.Value> attributes = 15 [json_name="atts"];
 
 	//todo delivery_zones
