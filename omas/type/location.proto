@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package omas.type;
 
-//import "google/protobuf/struct.proto";
+import "google/protobuf/struct.proto";
 import "google/type/latlng.proto";
 
 import "omas/type/availability.proto";
