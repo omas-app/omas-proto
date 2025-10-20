@@ -50,8 +50,8 @@ dotnet-grpc add-url $url --project src/Omas.Client --output $proto
 - hdrs:headers
 - vals:values
 - opts:options
-- cts:created_at
-- mts:modified_at
+- cts:create_time
+- uts:update_time
 - ets:end_time
 - loc:location
 - addr:address

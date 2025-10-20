@@ -24,7 +24,8 @@ message Location {
 
 	google.type.LatLng  lat_lng = 11;
 
-	repeated AvailabilityTime availability_times = 14;
+	//alias: availability_times
+	repeated AvailabilityTime open_hours = 14;
 	
 	map<string, google.protobuf.Value> attributes = 15 [json_name="atts"];
 
