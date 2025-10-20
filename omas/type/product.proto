@@ -31,11 +31,18 @@ message Product {
 	Info   info = 6;
 	repeated string tags = 7;
 
-	double price = 11 [json_name="pr"]; //incl. vat
-	google.protobuf.DoubleValue vat_p = 12; //percent
+	//incl. vat
+	double price = 11 [json_name="pr"];
+
+	//vat in percent
+	//zero is a valid vat
+	//when omitted the vat is unknown
+	google.protobuf.DoubleValue vat_p = 12; 
 
 	repeated ProductOption options = 14  [json_name="opts"];
-	bool no_inherit = 15; //do not inherit options from group
+
+	//do not inherit options from group
+	bool no_inherit = 15;
 
 	//Vendor vendor = 00;
 
@@ -62,22 +69,19 @@ message Product {
 message ProductOption {
 	string slug = 2;
 
-	string name = 5  [json_name="label"];
+	string display_name = 5  [json_name="label"];
 
-	//min total selections
-	//default: 0
-	int32 range_min = 6  [json_name="min"]; 
-
-	//max total selections
+	//min required selection quantity
+	int32 range_min = 6  [json_name="min"];
+	
+	//total max quantity of all selected options combined
 	//default: 1
-	int32 range_max = 7  [json_name="max"]; 
-
-	//max quantity per option
-	//default: 1
-	int32 range_max_quantity = 8 [json_name="maxQ"]; 
-
-	//free count
-	//default: 0
+	int32 range_max = 7  [json_name="max"];
+	
+	//max quantity of a single option
+	int32 range_max_quantity = 8 [json_name="maxQ"]; //max quantity
+	
+	//the quantity of free of charge options
 	int32 range_free = 9 [json_name="free"]; 
 	
 	repeated Value values = 10  [json_name="vals"];
@@ -85,7 +89,7 @@ message ProductOption {
 	message Value {
 		string slug = 2;
 	
-		string name = 5  [json_name="label"];
+		string display_name = 5  [json_name="label"];
 	
 		double price = 11 [json_name="pr"];
 
@@ -99,10 +103,10 @@ message ProductOption {
 message ProductGroup {
 
 	//product group path
-	//format: delivery/pizza/family
+	//format: pizza/family
 	string slug = 2;
 
-	string name = 5  [json_name="label"];
+	string display_name = 5  [json_name="label"];
 	Info info = 6;
 	
 	repeated Product products = 10;

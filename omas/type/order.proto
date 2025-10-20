@@ -3,6 +3,7 @@ syntax = "proto3";
 package omas.type;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/struct.proto";
 
@@ -41,8 +42,6 @@ message Order {
 	
 	Amount amount = 10;
 	
-	//map<string, double> vat_a = 11;
-
 	// The via tells how the order was created. 
 	Via via = 12;
 	
@@ -50,17 +49,20 @@ message Order {
 
 	google.protobuf.Value metadata = 25 [json_name="meta"];
 
+	//order expiration after it should not be accepted (AIP-134)
+	oneof expiration {
+		google.protobuf.Timestamp expire_time = 31;
+		google.protobuf.Duration ttl = 32 [(google.api.field_behavior) = INPUT_ONLY];
+	}
+
 	message Amount {
 		string currency = 1 [json_name="ccy"];
 
 		// sub total
-		// sum of all product lines including vat
+		// sum of all product lines incl. vat
 		double value = 2 [json_name="val"];
 
-		//double shipping_cost = 3; //shipping has vat 10 or 20 depending on products
-		//double discount = 4;		
-
-		// example: shipping cost, service fee, reusable deposit
+		// example: devlivery-fee, service-fee, min-order-fee, deposit for reusable deposit
 		map<string, double> charges = 5; 
 
 		// example: onlinebonus, 10% Discount
@@ -70,14 +72,14 @@ message Order {
 		double total = 10;
 
 		// vat amounts 
-		// included value added tax
+		// amount of included value added tax
 		// example: 0%: 2.00, 10%: 10.70, 20%: 2.55
 		map<string, double> vat = 11;
 	}
 
 	message Via {
 
-		// How the order was placed
+		// How the order was placed expressed as a via type
 		// example: mobile, mail, web, api, phone, chat
 		string channel = 1;
 
@@ -140,19 +142,17 @@ message OrderLine {
 	//note of customer
 	string note = 23; 
 
-	//bool optional = 24; //the vendor is allowed to decrease the quantity to zero
-	//google.protobuf.Value metadata = 25;
-
 	message Entry {
 		reserved 14;
 
-		//default to artikel
+		//default: ARTIKEL
 		EntryType type = 3; 
 
-		string name = 5 [json_name="label"];
+		string display_name = 5 [json_name="label"];
+
 		string description = 6 [json_name="desc"];
 
-		//incl. vat	
+		//unit price incl. extra options and incl. vat	
 		double price = 7 [json_name="pr"]; 	
 
 		//vat percent
@@ -164,6 +164,7 @@ message OrderLine {
 				type: "omas.type/Product"
 			}];
 
+		//list of selected customizaions
 		repeated ProductOption options = 15 [json_name="opts"];
 
 		enum EntryType {
@@ -174,5 +175,3 @@ message OrderLine {
 		}
 	}
 }
-
-

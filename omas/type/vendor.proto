@@ -29,8 +29,12 @@ message Vendor {
 	string id = 1;
 	string slug = 2;
 
-	//resource name: vendors/{vendor}
+	//resource name
+	//format: vendors/{vendor}
 	string name = 3  [(google.api.field_behavior) = IDENTIFIER]; 
+
+	//alias slugs that the vendor is also known by
+	repeated string aliases = 4;
 
 	string  display_name = 5  [json_name="label"];
 	Info    info = 6;
@@ -53,7 +57,13 @@ message Vendor {
 
 	Disturbance disturbance = 20;
 
-	google.protobuf.Value metadata = 25 [json_name="meta"];	
+	google.protobuf.Value metadata = 25  [json_name="meta"];
+
+	// The vendor to redirect to.
+    // Format: `vendors/{vendor}`.
+    string replacement_vendor = 35 [(google.api.resource_reference) = {
+      type: "omas.type/Vendor"
+    }];
 
 	message Info {
 		Rating rating = 4;

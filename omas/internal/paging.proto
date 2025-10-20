@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package omas.internal;
+
+option csharp_namespace = "Omas.Protos.Internal";
+
+
+message PageToken {
+
+	// last keys (exclusive)
+	repeated bytes last_keys = 5;
+
+	// start sequence number (inclusive)
+	uint64 start_sequence = 6 [json_name="startSeq"];
+}

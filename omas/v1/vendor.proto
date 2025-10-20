@@ -15,6 +15,7 @@ import "google/api/client.proto";
 import "google/api/resource.proto";
 
 import "omas/type/vendor.proto";
+import "omas/type/catalog.proto";
 
 option csharp_namespace = "Omas.Protos.V1";
 
@@ -31,7 +32,7 @@ service OmasVendorService {
 
 	/* standard methods */
 
-	//get order (AIP-131)
+	//get vendor (AIP-131)
 	rpc GetVendor(GetVendorRequest) returns (omas.type.Vendor) {
 		option (google.api.http) = { 
 			get: "/v1/{name=vendors/*}"
@@ -39,7 +40,7 @@ service OmasVendorService {
 		option (google.api.method_signature) = "name";
 	}
 
-	//list orders (AIP-134)
+	//list vendors (AIP-132)
 	rpc ListVendors(ListVendorsRequest) returns (ListVendorsResponse) {
 		option (google.api.http) = { 
 			get: "/v1/vendors" 
@@ -47,7 +48,7 @@ service OmasVendorService {
 		//option (google.api.method_signature) = "";
 	}
 
-	//update order (AIP-132)
+	//update vendor (AIP-134)
 	rpc UpdateVendor(UpdateVendorRequest) returns (omas.type.Vendor) {
 		option (google.api.http) = { 
 			patch: "/v1/{vendor.name=vendors/*}",
@@ -55,6 +56,14 @@ service OmasVendorService {
 		};
 		option (google.api.method_signature) = "vendor,update_mask";
 	}	
+
+	//get catalog (AIP-131)
+	rpc GetCatalog(GetCatalogRequest) returns (omas.type.Catalog) {
+		option (google.api.http) = { 
+			get: "/v1/{name=vendors/*/catalogs/*}"
+		};
+		option (google.api.method_signature) = "name";
+	}
 }
 
 
@@ -88,6 +97,10 @@ message GetVendorRequest {
     (google.api.resource_reference) = {
       type: "omas.type/Vendor"
     }];
+
+  //see: https://google.aip.dev/157
+  //default: BASIC
+  VendorView view = 8;
 }
 
 message ListVendorsRequest {	
@@ -95,8 +108,18 @@ message ListVendorsRequest {
 	int32  page_size = 2; // Default 50, Maximum 1000; 
 	string page_token = 3;
 
-	//todo string filter see: https://google.aip.dev/160 
-	//todo string order_by https://google.aip.dev/132#ordering
+	//see: https://google.aip.dev/160
+	//example: `tag:burger zone:1060` vendors with tag bruger and delivery or pickup zone 1060  
+	//example: `zone:1060 pizzeria` vendors with delivery or pickup zone 1060 and search term `pizzeria`
+	string filter = 6;
+
+	//see: https://google.aip.dev/132#ordering
+	string order_by = 7;
+
+	//see: https://google.aip.dev/157
+	//default: BASIC
+	VendorView view = 8;
+
 	//todo show_deleted https://google.aip.dev/132#soft-deleted-resources
 }
 
@@ -113,6 +136,17 @@ message ListVendorsResponse {
 	];
 }
 
+enum VendorView {
+	VENDOR_VIEW_UNSPECIFIED = 0;
+
+	VENDOR_VIEW_BASIC = 1;
+
+	//all available fields
+	VENDOR_VIEW_FULL = 15;
+}
+
+
+
 message UpdateVendorRequest {
 
 	// The vendor to update.
@@ -123,4 +157,17 @@ message UpdateVendorRequest {
 
 	// The list of fields to be updated. (repeated fields are replaced)
 	google.protobuf.FieldMask update_mask = 2;
+}
+
+
+
+message GetCatalogRequest {
+
+  // The name of the vendor catalog to retrieve.
+  // Format: vendors/{vendor}/catalogs/{catalog}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Catalog"
+    }];
 }

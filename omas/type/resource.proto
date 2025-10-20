@@ -13,19 +13,35 @@ message Resource {
 	//todo define stanalone resource
 
 	string id = 1;
-	string display_name = 2 [json_name="label"]; //file name
-	string type = 3; //content type as mime
-	int32  size = 4; //content size in bytes
+
+	//file name
+	string display_name = 2 [json_name="label"]; 
+	
+	//content type as mime
+	string type = 3; 
+
+	//content size in bytes
+	int32  size = 4; 
+
+	//example: auto for autonomous assigned images
+	repeated string tags = 5;
 
 	google.protobuf.Timestamp modified_at = 7 [json_name="mts"];
-	fixed32 crc32 = 8; //hash
+
+	//crc32 hash of resource data
+	fixed32 crc32 = 8; 
 
 	oneof content {
-		string url = 10; //content url
+
+		//content url
+		string url = 10; 
+
 		bytes data = 11;
 	}
 
-	repeated Resource thumbnails = 14 [json_name="thumbs"]; //resized and preview images 
+	//resized and preview images 
+	repeated Resource thumbnails = 14 [json_name="thumbs"]; 
+
 	map<string, google.protobuf.Value> attributes = 15 [json_name="atts"];
 
 	google.protobuf.Value metadata = 25 [json_name="meta"];

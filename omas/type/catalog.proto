@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/struct.proto";
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+import "omas/type/product.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+message Catalog {
+	option (google.api.resource) = {
+		type: "omas.type/Catalog"
+		pattern: "vendors/{vendor}/catalogs/{catalog}"
+		singular: "catalog"
+		plural: "catalogs"
+	};
+
+	//resource name
+	//format: vendors/{vendor}/catalogs/{catalog}
+	string name = 3 [(google.api.field_behavior) = IDENTIFIER];
+
+	//string display_name = 5  [json_name="label"];
+
+	repeated ProductGroup product_groups = 7;
+
+	repeated string tags = 15;	
+}
+

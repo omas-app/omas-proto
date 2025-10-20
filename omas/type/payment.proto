@@ -11,14 +11,22 @@ option csharp_namespace = "Omas.Protos";
 message Payment {
 	google.protobuf.Timestamp timestamp = 1 [json_name="ts"];
 	
+	//name of payment provider
+	//example: delivery, stripe
 	string system = 5 [json_name="sys"];
+
+	//used payment method
+	//example: cash, card
 	string method = 6;
+
 	State  state = 7;
 	string sender = 8;
 	string receiver = 9;
 	string foreign_id = 10 [json_name="fid"];
 	string description = 11 [json_name="desc"];
 	string currency = 12 [json_name="ccy"];
+
+	//the confirmed paid amount
 	double amount = 13;
 
 	google.protobuf.Value metadata = 25 [json_name="meta"];

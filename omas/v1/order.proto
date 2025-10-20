@@ -10,6 +10,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/field_mask.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
+import "google/api/field_info.proto";
 import "google/api/client.proto";
 import "google/api/resource.proto";
 
@@ -120,15 +121,28 @@ message PlaceOrderRequest {
 			child_type: "omas.type/Order"
 		}];
 
+	// This request is idempotent if a `request_id` is provided.
+	// Fallbacks to order.id
+    string request_id = 4 [(google.api.field_info).format = UUID4];
+
 	omas.type.Order order = 5;
 	string status_url = 6;
 	//todo client
+
+
 }
 
 message PlaceOrderResponse {
-	//todo resource name
 
-	omas.type.Order order = 5;
+   // The name of the order to placed.
+   // Format: vendors/{vendor}/orders/{order}
+   string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Fulfillment"
+    }];
+
+    omas.type.Order order = 5;
 	string pay_url = 6;
 }
 
@@ -229,6 +243,11 @@ message GetOrderRequest {
     (google.api.resource_reference) = {
       type: "omas.type/Fulfillment"
     }];
+
+  //see: https://google.aip.dev/157
+  //default: BASIC for unauthenticated request
+  //default: FULL for authenticated request
+  OrderView view = 8;
 }
 
 message ListOrdersRequest {	
@@ -244,9 +263,15 @@ message ListOrdersRequest {
 	int32  page_size = 2; // Default 50, Maximum 1000; 
 	string page_token = 3;
 
+	//see: https://google.aip.dev/157
+	//default: BASIC
+	OrderView view = 8;
+
 	//todo string filter see: https://google.aip.dev/160 
 	//todo string order_by https://google.aip.dev/132#ordering
 	//todo show_deleted https://google.aip.dev/132#soft-deleted-resources
+
+
 }
 
 message ListOrdersResponse {
@@ -260,6 +285,16 @@ message ListOrdersResponse {
 	repeated string unreachable = 4 [
 		(google.api.field_behavior) = UNORDERED_LIST
 	];
+}
+
+enum OrderView {
+	ORDER_VIEW_UNSPECIFIED = 0;
+
+	//ussage: anaonymous order tracking
+	ORDER_VIEW_BASIC = 1;
+
+	//all available fields
+	ORDER_VIEW_FULL = 15;
 }
 
 message UpdateOrderRequest {
