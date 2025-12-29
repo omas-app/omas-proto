@@ -4,6 +4,7 @@ package omas.type;
 
 import "google/protobuf/timestamp.proto";
 //import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
 import "google/type/latlng.proto";
 
 import "omas/type/location.proto";
@@ -37,6 +38,16 @@ message DeliveryInfo {
 
 	//used for delivery notifaction
 	string email = 14;
+
+	// Notifications tied to delivery
+	Notifications notifications = 15  [json_name="notify"];
+
+	message Notifications {
+		//default: true
+		google.protobuf.BoolValue email = 1;
+		//default: false
+		google.protobuf.BoolValue sms = 2;
+	}
 }
 
 message DeliveryZone {

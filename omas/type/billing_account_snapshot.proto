@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package omas.type;
+
+//import "google/protobuf/timestamp.proto";
+//import "google/protobuf/struct.proto";
+//import "google/protobuf/wrappers.proto";
+//import "google/protobuf/duration.proto";
+//import "google/api/field_behavior.proto";
+
+import "google/api/resource.proto";
+
+//import "google/type/date.proto";
+//import "google/type/money.proto";
+//import "google/type/interval.proto";
+import "google/type/postal_address.proto";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+
+
+message BillingAccountSnapshot {
+
+	string billing_account = 1 [
+		(google.api.resource_reference) = {
+			type: "omas.type/BillingAccount"
+		}];
+
+	string legal_name = 3;
+	string company_form = 4;
+	string tax_id = 5;
+
+	google.type.PostalAddress address = 6;
+
+	string invoice_email = 7;
+
+	google.protobuf.Timestamp snapshot_time = 15;
+}

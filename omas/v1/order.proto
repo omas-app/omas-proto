@@ -126,10 +126,11 @@ message PlaceOrderRequest {
     string request_id = 4 [(google.api.field_info).format = UUID4];
 
 	omas.type.Order order = 5;
+
+	//callback for payment provider
 	string status_url = 6;
-	//todo client
-
-
+	
+	
 }
 
 message PlaceOrderResponse {

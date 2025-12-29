@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
+//import "google/protobuf/duration.proto";
+import "google/api/field_behavior.proto";
+
+import "google/api/resource.proto";
+
+import "google/type/date.proto";
+import "google/type/money.proto";
+//import "google/type/interval.proto";
+
+
+import "omas/type/billing_account_snapshot.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+
+// Settlement represents a financial settlement over a period for a tenant.
+message FinancialSettlement {
+	option (google.api.resource) = {
+		type: "omas.type/Settlement"
+		pattern: "tenants/{tenant}/settlements/{settlement}"
+		singular: "settlement"
+		plural: "settlements"
+	};
+
+	//format: tenant/{tenant}/settlements/{settlement}
+	string name = 1  [(google.api.field_behavior) = IDENTIFIER];
+
+	string vendor = 2;
+
+	string billing_account = 3 [
+		(google.api.resource_reference) = {
+			type: "omas.type/BillingAccount"
+		}];
+
+	enum State {
+		STATE_UNSPECIFIED = 0;
+		DRAFT = 1;
+		FINALIZED = 2;
+	}
+	State state = 5;
+
+	// Business period covered by this settlement
+	google.type.Date period_start = 6;
+	google.type.Date period_end = 7;
+
+	// 0-1, e.g., 0.05 = 5%
+	double commission_percent = 8;
+
+	FinancialSettlementSummary summary = 13;
+
+	// Timestamp of creation
+	google.protobuf.Timestamp create_time = 14;
+
+	// Timestamp of last update
+	google.protobuf.Timestamp update_time = 15;
+
+	
+	string invoice_id = 41;
+
+	// Optional URI of the exported settlement file (CSV/JSON/PDF)
+	string export_uri = 42;
+
+
+	message Finalized {
+		omas.type.BillingAccountSnapshot billing_account = 1;
+
+		//todo line items
+	}
+	//return by the finalized view
+	Finalized finalized = 50 [(google.api.field_behavior) = OPTIONAL];
+}
+
+message FinancialSettlementSummary {
+	// Total number of orders included
+	int32 order_count = 1;
+
+	// Total aggregated order amount
+	google.type.Money total_order_amount = 3;
+
+	// Total aggregated commission for this settlement
+	google.type.Money total_commission = 4;
+}
+
+// SettlementLineItem resource
+message FinancialSettlementLineItem {
+	option (google.api.resource) = {
+		type: "omas.type/SettlementLineItem"
+		pattern: "tenants/{tenant}/settlements/{settlement}/lineItems/{line_item}"
+	};
+
+	//format: tenant/{tenant}/settlements/{settlement}/lineItems/{line_item}
+	string name = 1  [(google.api.field_behavior) = IDENTIFIER];
+
+	string order = 2 [
+		(google.api.resource_reference) = {
+			type: "omas.type/Order"
+	}];
+
+	google.protobuf.Timestamp order_time = 3;
+
+		
+	bool excluded = 6 [(google.api.field_behavior) = OPTIONAL];
+	
+	//e.g., "EUR"
+	string currency_code = 7;
+	int64 order_units = 8;
+	int64 commission_units = 9;
+	google.protobuf.Int64Value commission_override_units = 10 [
+		(google.api.field_behavior) = OPTIONAL
+	];
+
+	string note = 20 [
+		(google.api.field_behavior) = OPTIONAL
+	];
+}
+
+enum PeriodPattern {
+  PERIOD_PATTERN_UNSPECIFIED = 0;
+  MONTHLY = 1;
+  BIMONTHLY = 2;
+  WEEKLY = 3;
+}

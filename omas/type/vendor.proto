@@ -79,7 +79,14 @@ message Vendor {
 	}
 }
 
+//see: https://schema.org/AggregateRating
 message Rating {
+	//ratingValue
+	//max: 5
 	double value = 1  [json_name="val"];
+
+	//ratingCount
 	int32 count = 2;
+
+	//todo worstRating, bestRating, reviewCount
 }

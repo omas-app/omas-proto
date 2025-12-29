@@ -22,6 +22,7 @@ message Disturbance {
 	// service with disturbance
 	// listed services should be disabled
 	// example: pickup, delivery
+	// example: assembly-degraded, delivery-degraded for delayed fulfillment
 	repeated string services = 12;
 }
 

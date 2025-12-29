@@ -1,0 +1,230 @@
+syntax = "proto3";
+
+package omas.v1;
+
+import "google/protobuf/empty.proto";
+//import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
+//import "google/protobuf/timestamp.proto";
+//import "google/protobuf/duration.proto";
+import "google/protobuf/field_mask.proto";
+
+import "google/type/date.proto";
+import "google/type/money.proto";
+//import "google/type/interval.proto";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/api/client.proto";
+import "google/api/resource.proto";
+import "google/longrunning/operations.proto";
+
+
+
+import "omas/type/financial_settlement.proto";
+
+option csharp_namespace = "Omas.Protos.V1";
+
+
+service OmasSettlementService {
+
+ // Preview eligible vendors for a settlement run over a period
+  rpc PreviewSettlementRun(PreviewSettlementRunRequest) returns (PreviewSettlementRunResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=tenants/*}/settlements:previewRun"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  rpc RunSettlement(RunSettlementRequest) returns (RunSettlementResponse) {
+    option (google.api.http) = {
+      post: "/v1/{parent=tenants/*}/settlements:run"
+    };
+  }
+
+  //create settlement (AIP-133)
+  rpc CreateSettlement(CreateSettlementRequest) returns (omas.type.FinancialSettlement) {
+    option (google.api.http) = {
+      post: "/v1/tenants/{tenant}/settlements"
+      body: "settlement"
+    };
+    option (google.api.method_signature) = "parent,settlement";
+  }
+
+  //get settlement (AIP-131)
+  rpc GetSettlement(GetSettlementRequest) returns (omas.type.FinancialSettlement) {
+    option (google.api.http) = {
+      get: "/v1/{name=tenants/*/settlements/*}"
+    };
+  }
+
+  //list settlement (AIP-132)
+  rpc ListSettlements(ListSettlementsRequest) returns (ListSettlementsResponse) {
+    option (google.api.http) = {
+      get: "/v1/tenants/{tenant}/settlements"
+    };
+  }
+
+  //update settlement (AIP-134)
+  rpc UpdateSettlement(UpdateSettlementRequest) returns (omas.type.FinancialSettlement) {
+    option (google.api.http) = {
+      patch: "/v1/{settlement.name=tenants/*/settlements/*}"
+      body: "*"
+    };
+  }
+
+  //delete settlement (AIP-135)
+  rpc DeleteSettlement(DeleteSettlementRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/{name=tenants/*/settlements/*}"
+    };
+  }
+
+  rpc FinalizeSettlement(FinalizeSettlementRequest) returns (FinalizeSettlementResponse) {
+    option (google.api.http) = {
+      post: "/v1/{name=tenants/*/settlements/*}:finalize"
+    };
+  }
+
+  //delete settlement line items (AIP-134)
+  rpc UpdateSettlementLineItem(UpdateSettlementLineItemRequest) returns (omas.type.FinancialSettlementLineItem) {
+    option (google.api.http) = {
+      patch: "/v1/{line_item.name=tenants/*/settlements/*}/lineItems"
+      body: "*"
+    };
+  }
+
+  //list settlement line items (AIP-132)
+  rpc ListSettlementLineItems(ListSettlementLineItemsRequest) returns (ListSettlementLineItemsResponse) {
+    option (google.api.http) = {
+      get: "/v1/{parent=tenants/*/settlements/*}/lineItems"
+    };
+  }
+}
+
+// Request message for previewing a settlement run
+message PreviewSettlementRunRequest {
+  string parent = 1;                      // Full tenant resource name: "tenants/{tenant_id}"
+  google.type.Date period_start = 2;      // Start of the period to preview
+  google.type.Date period_end = 3;        // End of the period to preview
+}
+
+// Response message for previewing a settlement run
+message PreviewSettlementRunResponse {
+    // Summary information for each vendor in the preview
+    message VendorSummary {
+      // Full vendor resource name: "tenants/{tenant_id}/vendors/{vendor_id}"
+      string vendor = 1;
+
+      // Resource name: "tenants/{tenant_id}/billingAccounts/{id}"
+      string billing_account = 2;  
+
+      // Number of unsettled orders in the period
+      int32 unsettled_orders_count = 5;
+
+      // Total amount of unsettled orders 
+      google.type.Money estimated_total_order_amount = 6;
+    }
+    repeated VendorSummary vendors = 1;     // List of vendors eligible for settlement
+}
+
+message RunSettlementRequest {
+  string parent = 1;
+
+  google.type.Date period_start = 2;
+  google.type.Date period_end = 3;
+
+  //default: all
+  repeated string vendors = 5 [
+    (google.api.field_behavior) = OPTIONAL,
+    (google.api.resource_reference) = {
+        type: "omas.type/Vendor"
+    }];
+  string billing_account = 6  [
+    (google.api.field_behavior) = OPTIONAL,
+    (google.api.resource_reference) = {
+        type: "omas.type/BillingAccount"
+    }]; 
+  omas.type.PeriodPattern period_pattern = 7 [(google.api.field_behavior) = OPTIONAL];
+  google.protobuf.DoubleValue commission_percent = 9 [(google.api.field_behavior) = OPTIONAL]; 
+}
+
+message RunSettlementResponse {
+    // drafts created or existing drafts
+    repeated string settlements = 1; 
+}
+
+message CreateSettlementRequest {
+
+	string parent = 1 [
+        (google.api.field_behavior) = REQUIRED,
+        (google.api.resource_reference) = {
+          child_type: "omas.type/Settlement"
+        }];
+	
+    omas.type.FinancialSettlement settlement = 2;
+}
+
+message GetSettlementRequest {
+	string name = 1;
+
+    SettlementView view = 8;
+}
+
+message ListSettlementsRequest {
+  string tenant = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+
+  SettlementView view = 8;
+}
+
+message ListSettlementsResponse {
+  repeated omas.type.FinancialSettlement settlements = 1;
+  string next_page_token = 2;
+}
+
+enum SettlementView {
+	//default: BASIC
+	TEAM_VIEW_UNSPECIFIED = 0;
+
+	TEAM_VIEW_BASIC = 1;
+
+    TEAM_VIEW_FINALIZED = 10;
+
+	TEAM_VIEW_FULL = 15;
+}
+
+message UpdateSettlementRequest {
+  omas.type.FinancialSettlement settlement = 1;
+
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message DeleteSettlementRequest {
+  string name = 1;
+}
+
+message FinalizeSettlementRequest {
+  string name = 1; // Settlement resource
+}
+
+message FinalizeSettlementResponse {
+  omas.type.FinancialSettlement settlement = 1;
+}
+
+message UpdateSettlementLineItemRequest {
+  omas.type.FinancialSettlementLineItem line_item = 1;
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message ListSettlementLineItemsRequest {
+  string parent = 1; // tenants/{tenant}/settlements/{settlement}
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListSettlementLineItemsResponse {
+  repeated omas.type.FinancialSettlementLineItem line_items = 1;
+  string next_page_token = 2;
+}
