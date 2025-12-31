@@ -98,9 +98,9 @@ message ListBillingAccountsResponse {
 
 enum BillingAccountView {
 	//default: BASIC
-	TEAM_VIEW_UNSPECIFIED = 0;
+	BILLING_ACCOUNT_VIEW_UNSPECIFIED = 0;
 
-	TEAM_VIEW_FULL = 15;
+	BILLING_ACCOUNT_VIEW_FULL = 15;
 }
 
 message UpdateBillingAccountRequest {

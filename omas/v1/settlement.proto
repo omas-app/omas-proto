@@ -186,13 +186,13 @@ message ListSettlementsResponse {
 
 enum SettlementView {
 	//default: BASIC
-	TEAM_VIEW_UNSPECIFIED = 0;
+	SETTLEMENT_VIEW_UNSPECIFIED = 0;
 
-	TEAM_VIEW_BASIC = 1;
+	SETTLEMENT_VIEW_BASIC = 1;
 
-    TEAM_VIEW_FINALIZED = 10;
+  SETTLEMENT_VIEW_FINALIZED = 10;
 
-	TEAM_VIEW_FULL = 15;
+	SETTLEMENT_VIEW_FULL = 15;
 }
 
 message UpdateSettlementRequest {
