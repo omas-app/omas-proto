@@ -80,13 +80,19 @@ message CreateBillingAccountRequest {
 message GetBillingAccountRequest {
 	string name = 1;
 
-    BillingAccountView view = 8;
+  BillingAccountView view = 8;
 }
 
 message ListBillingAccountsRequest {
   string tenant = 1;
   int32 page_size = 2;
   string page_token = 3;
+
+  //see: https://google.aip.dev/160
+	string filter = 6;
+
+  //see https://google.aip.dev/132#ordering
+	string order_by = 7;
 
   BillingAccountView view = 8;
 }
