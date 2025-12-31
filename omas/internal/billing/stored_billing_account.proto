@@ -9,11 +9,14 @@ import "omas/type/billing_account.proto";
 option csharp_namespace = "Omas.Protos";
 
 message StoredBillingAccount {
-  int32 schema_version = 1;
+	//10-12: legacy dual usage with DataMessage
+	reserved 10 to 12; 
 
-  // Current mutable state
-  omas.type.BillingAccount billing_account = 2;
+	int32 schema_version = 1;
+
+	// Current mutable state
+	omas.type.BillingAccount billing_account = 2;
 
 
-  google.protobuf.Timestamp update_time = 15;
+	google.protobuf.Timestamp update_time = 15;
 }

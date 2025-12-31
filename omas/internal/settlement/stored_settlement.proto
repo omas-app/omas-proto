@@ -10,16 +10,19 @@ import "omas/type/billing_account_snapshot.proto";
 option csharp_namespace = "Omas.Protos";
 
 message StoredSettlement {
-  int32 schema_version = 1;
+	  //10-12: legacy dual usage with DataMessage
+	  reserved 10 to 12; 
 
-  // Full resource state (draft/finalized)
-  omas.type.FinancialSettlement settlement = 2;
+	  int32 schema_version = 1;
 
-  // Immutable snapshot of billing account at finalization
-  omas.type.BillingAccountSnapshot billing_account = 9;
+	  // Full resource state (draft/finalized)
+	  omas.type.FinancialSettlement settlement = 2;
 
-  // Immutable snapshot of line items at finalization
-  repeated omas.type.FinancialSettlementLineItem line_items = 12;   
+	  // Immutable snapshot of billing account at finalization
+	  omas.type.BillingAccountSnapshot billing_account = 8;
 
-  google.protobuf.Timestamp update_time = 15;
+	  // Immutable snapshot of line items at finalization
+	  repeated omas.type.FinancialSettlementLineItem line_items = 9;   
+
+	  google.protobuf.Timestamp update_time = 15;
 }
