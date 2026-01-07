@@ -29,6 +29,6 @@ message StoredSettlement {
 	  // Timestamp when finalizing process started. Used to detect stale finalizing
 	  // settlements that may need retry (e.g., if process crashed mid-finalization).
 	  // Cleared when finalization completes successfully.
-	  google.protobuf.Timestamp finalizing_started_at = 16;
+	  google.protobuf.Timestamp finalization_start_time = 16;
 
 }
