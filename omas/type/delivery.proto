@@ -39,15 +39,16 @@ message DeliveryInfo {
 	//used for delivery notifaction
 	string email = 14;
 
-	// Notifications tied to delivery
-	Notifications notifications = 15  [json_name="notify"];
-
 	message Notifications {
 		//default: true
 		google.protobuf.BoolValue email = 1;
 		//default: false
 		google.protobuf.BoolValue sms = 2;
 	}
+	// Notifications tied to delivery
+	Notifications notifications = 15  [json_name="notify"];
+
+
 }
 
 message DeliveryZone {

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package omas.type;
+
+option csharp_namespace = "Omas.Protos";
+
+enum PeriodPattern {
+  PERIOD_PATTERN_UNSPECIFIED = 0;
+  MONTHLY = 1;
+  BIMONTHLY = 2;
+  WEEKLY = 3;
+}

@@ -15,6 +15,8 @@ import "google/api/resource.proto";
 //import "google/type/interval.proto";
 import "google/type/postal_address.proto";
 
+import "omas/type/period.proto";
+
 option csharp_namespace = "Omas.Protos";
 
 
@@ -38,4 +40,24 @@ message BillingAccount {
 	google.type.PostalAddress address = 6;
 
 	string invoice_email = 7;
+	
+	omas.type.PeriodPattern period_pattern = 8 [(google.api.field_behavior) = OPTIONAL];
+  	
+	// 0-1, e.g., 0.05 = 5%
+	google.protobuf.DoubleValue commission_percent = 10 [(google.api.field_behavior) = OPTIONAL]; 
+
+	// IBAN for payment processing
+	string iban = 11;
+
+	// Company registration number (Firmenbuchnummer)
+	string company_registration_number = 12;
+
+	// Access passcode for settlement detail data (6 chars alphanumeric)
+	string passcode = 13;
+
+
+	repeated string vendors = 15 [
+		(google.api.resource_reference) = {
+			type: "omas.type/Vendor"
+		}];
 }

@@ -268,11 +268,23 @@ message ListOrdersRequest {
 	//default: BASIC
 	OrderView view = 8;
 
-	//todo string filter see: https://google.aip.dev/160 
-	//todo string order_by https://google.aip.dev/132#ordering
+	// Filter expression for AIP-160 filtering
+	// Supported fields: vendor_id, state, create_time
+	// Examples: 
+	//   state = "COMPLETED"
+	//   create_time >= "2024-01-01T00:00:00Z"
+	//   vendor_id = "vendor123" AND state = "PENDING"
+	// see: https://google.aip.dev/160
+	string filter = 6;
+
+	// Order by expression for AIP-132 ordering
+	// Supported fields: create_time, update_time
+	// Default: create_time desc
+	// Examples: create_time desc, create_time asc
+	// see: https://google.aip.dev/132#ordering
+	string order_by = 7;
+
 	//todo show_deleted https://google.aip.dev/132#soft-deleted-resources
-
-
 }
 
 message ListOrdersResponse {

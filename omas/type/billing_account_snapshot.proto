@@ -35,5 +35,14 @@ message BillingAccountSnapshot {
 
 	string invoice_email = 7;
 
+	// IBAN for payment processing
+	string iban = 11;
+
+	// Company registration number (Firmenbuchnummer)
+	string company_registration_number = 12;
+
+	// Access passcode for settlement detail data (6 chars alphanumeric)
+	string passcode = 13;
+
 	google.protobuf.Timestamp snapshot_time = 15;
 }

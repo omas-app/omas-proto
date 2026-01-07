@@ -1,0 +1,212 @@
+syntax = "proto3";
+
+package omas.type;
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/type/money.proto";
+import "google/type/date.proto";
+
+option csharp_namespace = "Omas.Protos";
+
+
+// Invoice state enum
+enum Invoice_State {
+  // Unspecified state
+  STATE_UNSPECIFIED = 0;
+  // Invoice is a draft, can still be modified
+  DRAFT = 1;
+  // Invoice has been sent/opened, awaiting payment
+  OPEN = 2;
+  // Invoice has been partially paid
+  PARTIALLY_PAID = 3;
+  // Invoice has been fully paid
+  PAID = 4;
+  // Invoice has been cancelled
+  CANCELLED = 5;
+}
+
+// Invoice type enum
+enum Invoice_Type {
+  // Unspecified type
+  TYPE_UNSPECIFIED = 0;
+  // Normal invoice
+  NORMAL = 1;
+  // Recurring invoice
+  RECURRING = 2;
+  // Cancellation invoice
+  CANCELLATION = 3;
+  // Reminder invoice
+  REMINDER = 4;
+  // Partial invoice
+  PARTIAL = 5;
+  // Advance invoice
+  ADVANCE = 6;
+  // Final invoice
+  FINAL = 7;
+}
+
+// Send type enum - how the invoice was sent to the customer
+enum Invoice_SendType {
+  // Unspecified send type
+  SEND_TYPE_UNSPECIFIED = 0;
+  // Printed
+  PRINT = 1;
+  // Sent via postal mail
+  POSTAL = 2;
+  // Sent via email
+  EMAIL = 3;
+  // Downloaded as PDF
+  PDF_DOWNLOAD = 4;
+}
+
+// Invoice resource
+// Represents an invoice in the billing system, typically synced with external providers like sevdesk
+message Invoice {
+  option (google.api.resource) = {
+    type: "omas.type/Invoice"
+    pattern: "tenants/{tenant}/invoices/{invoice}"
+    singular: "invoice"
+    plural: "invoices"
+  };
+
+  // Resource name: tenants/{tenant}/invoices/{invoice}
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
+
+  // Display name or title of the invoice
+  string display_name = 2;
+
+  // Invoice number (e.g., "RE-1000")
+  string invoice_number = 3;
+
+  // Current state of the invoice
+  Invoice_State state = 4;
+
+  // Type of invoice
+  Invoice_Type invoice_type = 5;
+
+  // Reference to the billing account this invoice is for
+  // Format: tenants/{tenant}/billingAccounts/{billing_account}
+  string billing_account = 6 [(google.api.resource_reference) = {
+    type: "omas.type/BillingAccount"
+  }];
+
+  // Reference to the settlement this invoice was created from (if applicable)
+  // Format: tenants/{tenant}/settlements/{settlement}
+  string settlement = 7;
+
+  // Invoice date
+  google.type.Date invoice_date = 8;
+
+  // Delivery date (when goods/services were delivered)
+  google.type.Date delivery_date = 9;
+
+  // Due date for payment
+  google.type.Date due_date = 10;
+
+  // Payment date (when invoice was paid)
+  google.type.Date pay_date = 11;
+
+  // Total amounts
+  google.type.Money sum_net = 12;
+  google.type.Money sum_tax = 13;
+  google.type.Money sum_gross = 14;
+  
+  // Amount already paid
+  google.type.Money paid_amount = 15;
+
+  // Currency code (ISO 4217)
+  string currency_code = 16;
+
+  // Tax rate as percentage (e.g., 19.0 for 19%)
+  double tax_rate = 17;
+
+  // Tax text description (e.g., "Umsatzsteuer 19%")
+  string tax_text = 18;
+
+  // Customer-facing header text
+  string head_text = 19;
+
+  // Customer-facing footer text
+  string foot_text = 20;
+
+  // Customer internal note/reference (e.g., PO number)
+  string customer_internal_note = 21;
+
+  // Complete address string for the invoice
+  string address = 22;
+
+  // How the invoice was sent
+  Invoice_SendType send_type = 23;
+
+  // Date when the invoice was sent
+  google.protobuf.Timestamp send_time = 24;
+
+  // External invoice ID (e.g., sevdesk invoice ID)
+  string external_id = 25;
+
+  // External provider name (e.g., "sevdesk")
+  string external_provider = 26;
+
+  // URL to view/download the invoice PDF
+  string pdf_url = 27;
+
+  // Creation timestamp
+  google.protobuf.Timestamp create_time = 28 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Last update timestamp
+  google.protobuf.Timestamp update_time = 29 [(google.api.field_behavior) = OUTPUT_ONLY];
+  
+  // Line items / positions on this invoice
+  repeated InvoiceLineItem line_items = 30;
+  
+  // Contact/customer display name (for quick display without resolving billing account)
+  string contact_name = 31;
+}
+
+// Invoice line item / position
+message InvoiceLineItem {
+  option (google.api.resource) = {
+    type: "omas.type/InvoiceLineItem"
+    pattern: "tenants/{tenant}/invoices/{invoice}/lineItems/{line_item}"
+    singular: "line_item"
+    plural: "line_items"
+  };
+
+  // Resource name
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
+
+  // Position number (0-indexed ordering)
+  int32 position_number = 2;
+
+  // Line item description/name
+  string description = 3;
+
+  // Quantity
+  double quantity = 4;
+
+  // Unit price (net)
+  google.type.Money unit_price = 5;
+
+  // Tax rate for this position
+  double tax_rate = 6;
+
+  // Net total (quantity * unit_price)
+  google.type.Money total_net = 7;
+
+  // Tax amount
+  google.type.Money total_tax = 8;
+
+  // Gross total
+  google.type.Money total_gross = 9;
+
+  // Unit of measurement
+  string unit = 10;
+
+  // Additional text/notes
+  string text = 11;
+
+  // Discount percentage
+  double discount_percent = 12;
+}

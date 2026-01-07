@@ -14,7 +14,6 @@ import "google/type/date.proto";
 import "google/type/money.proto";
 //import "google/type/interval.proto";
 
-
 import "omas/type/billing_account_snapshot.proto";
 
 option csharp_namespace = "Omas.Protos";
@@ -121,9 +120,3 @@ message FinancialSettlementLineItem {
 	];
 }
 
-enum PeriodPattern {
-  PERIOD_PATTERN_UNSPECIFIED = 0;
-  MONTHLY = 1;
-  BIMONTHLY = 2;
-  WEEKLY = 3;
-}

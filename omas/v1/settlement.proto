@@ -22,6 +22,8 @@ import "google/longrunning/operations.proto";
 
 
 import "omas/type/financial_settlement.proto";
+import "omas/type/period.proto";
+import "omas/type/contact.proto";
 
 option csharp_namespace = "Omas.Protos.V1";
 
@@ -100,6 +102,16 @@ service OmasSettlementService {
       get: "/v1/{parent=tenants/*/settlements/*}/lineItems"
     };
   }
+
+  // Generate a detailed report PDF for settlements in a time range for a billing account
+  // Returns PDF content without invoice - just settlement details
+  rpc GenerateBillingAccountReport(GenerateBillingAccountReportRequest) returns (GenerateBillingAccountReportResponse) {
+    option (google.api.http) = {
+      post: "/v1/{billing_account=tenants/*/billingAccounts/*}:generateReport"
+      body: "*"
+    };
+    option (google.api.method_signature) = "billing_account,period_start,period_end";
+  }
 }
 
 // Request message for previewing a settlement run
@@ -124,6 +136,12 @@ message PreviewSettlementRunResponse {
 
       // Total amount of unsettled orders 
       google.type.Money estimated_total_order_amount = 6;
+
+      // Vendor's display name
+      string vendor_display_name = 7;
+
+      // Vendor owner contact info (for prefilling billing account)
+      omas.type.Contact owner = 10;
     }
     repeated VendorSummary vendors = 1;     // List of vendors eligible for settlement
 }
@@ -237,4 +255,75 @@ message ListSettlementLineItemsRequest {
 message ListSettlementLineItemsResponse {
   repeated omas.type.FinancialSettlementLineItem line_items = 1;
   string next_page_token = 2;
+}
+
+// Request message for GenerateBillingAccountReport
+message GenerateBillingAccountReportRequest {
+  // Billing account resource name: tenants/{tenant}/billingAccounts/{billing_account}
+  string billing_account = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/BillingAccount"
+    }
+  ];
+
+  // Start of the period to include in the report
+  google.type.Date period_start = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // End of the period to include in the report
+  google.type.Date period_end = 3 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional: specific settlement IDs to include (if empty, includes all finalized settlements in period)
+  repeated string settlements = 4;
+
+  // Send the report via email instead of returning PDF content
+  bool send_email = 5;
+
+  // Email address to send report to (required if send_email is true)
+  string email = 6;
+
+  // Email subject line (optional - defaults to "Abrechnungsübersicht {period}")
+  string subject = 7;
+
+  // Email body text (optional - default template will be used)
+  string body = 8;
+
+  // CC email addresses
+  repeated string cc_emails = 9;
+
+  // BCC email addresses
+  repeated string bcc_emails = 10;
+}
+
+// Response message for GenerateBillingAccountReport
+message GenerateBillingAccountReportResponse {
+  // The PDF content (only set if send_email is false)
+  bytes pdf_content = 1;
+
+  // Suggested filename for the PDF
+  string filename = 2;
+
+  // Summary of settlements included in the report
+  repeated SettlementSummary settlements = 3;
+
+  // The message ID from the SMTP server (only set if send_email is true)
+  string message_id = 4;
+
+  // Summary info for a settlement included in the report
+  message SettlementSummary {
+    // Settlement resource name
+    string name = 1;
+
+    // Period string (e.g., "12/2025")
+    string period = 2;
+
+    // Vendor display name
+    string vendor = 3;
+
+    // Total commission for this settlement
+    google.type.Money total_commission = 4;
+
+    // Order count
+    int32 order_count = 5;
+  }
 }

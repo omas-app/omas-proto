@@ -19,7 +19,7 @@ import "omas/type/product.proto";
 option csharp_namespace = "Omas.Protos";
 
 message Order {
-	reserved 5, 11;
+	reserved 5-6, 11;
 
 	//uid
 	string id = 1; 
@@ -35,7 +35,7 @@ message Order {
 		}];
 
 	//Vendor vendor = 5 [deprecated=true];
-	Identity contact = 6 [deprecated=true];
+	//Identity contact = 6 [deprecated=true];
 
 	DeliveryInfo delivery = 7;
 	Payment payment = 8;

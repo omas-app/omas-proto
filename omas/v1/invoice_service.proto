@@ -1,0 +1,462 @@
+syntax = "proto3";
+
+package omas.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/api/client.proto";
+import "google/api/resource.proto";
+
+import "omas/type/invoice.proto";
+
+option csharp_namespace = "Omas.Protos.V1";
+
+
+// Invoice management service
+// Handles invoice operations including creating, sending, and tracking payments
+// Integrates with external billing providers like sevdesk
+service OmasInvoiceService {
+
+  // Create a new invoice (AIP-133)
+  rpc CreateInvoice(CreateInvoiceRequest) returns (omas.type.Invoice) {
+    option (google.api.http) = {
+      post: "/v1/tenants/{tenant}/invoices"
+      body: "invoice"
+    };
+    option (google.api.method_signature) = "parent,invoice";
+  }
+
+  // Get an invoice by name (AIP-131)
+  rpc GetInvoice(GetInvoiceRequest) returns (omas.type.Invoice) {
+    option (google.api.http) = {
+      get: "/v1/{name=tenants/*/invoices/*}"
+    };
+  }
+
+  // List invoices (AIP-132)
+  rpc ListInvoices(ListInvoicesRequest) returns (ListInvoicesResponse) {
+    option (google.api.http) = {
+      get: "/v1/tenants/{tenant}/invoices"
+    };
+  }
+
+  // Update an invoice (AIP-134)
+  // Only draft invoices can be updated
+  rpc UpdateInvoice(UpdateInvoiceRequest) returns (omas.type.Invoice) {
+    option (google.api.http) = {
+      patch: "/v1/{invoice.name=tenants/*/invoices/*}"
+      body: "*"
+    };
+  }
+
+  // Delete an invoice (AIP-135)
+  // Only draft invoices can be deleted
+  rpc DeleteInvoice(DeleteInvoiceRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/{name=tenants/*/invoices/*}"
+    };
+  }
+
+  // Send an invoice to the customer
+  // Transitions the invoice from DRAFT to OPEN state
+  rpc SendInvoice(SendInvoiceRequest) returns (omas.type.Invoice) {
+    option (google.api.http) = {
+      post: "/v1/{name=tenants/*/invoices/*}:send"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Mark an invoice as sent (without actually sending)
+  // Useful when invoice was sent manually or through another channel
+  rpc MarkInvoiceSent(MarkInvoiceSentRequest) returns (omas.type.Invoice) {
+    option (google.api.http) = {
+      post: "/v1/{name=tenants/*/invoices/*}:markSent"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name,send_type";
+  }
+
+  // Record a payment on an invoice
+  // Transitions invoice to PARTIALLY_PAID or PAID depending on amount
+  rpc RecordPayment(RecordPaymentRequest) returns (omas.type.Invoice) {
+    option (google.api.http) = {
+      post: "/v1/{name=tenants/*/invoices/*}:recordPayment"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name,amount";
+  }
+
+  // Cancel an invoice
+  // Creates a cancellation invoice and marks original as CANCELLED
+  rpc CancelInvoice(CancelInvoiceRequest) returns (omas.type.Invoice) {
+    option (google.api.http) = {
+      post: "/v1/{name=tenants/*/invoices/*}:cancel"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Reset an OPEN invoice back to DRAFT state
+  // Only possible if no payments have been recorded
+  rpc ResetInvoiceToDraft(ResetInvoiceToDraftRequest) returns (omas.type.Invoice) {
+    option (google.api.http) = {
+      post: "/v1/{name=tenants/*/invoices/*}:resetToDraft"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Get invoice PDF
+  // Returns the PDF content or URL for the invoice
+  rpc GetInvoicePdf(GetInvoicePdfRequest) returns (GetInvoicePdfResponse) {
+    option (google.api.http) = {
+      get: "/v1/{name=tenants/*/invoices/*}:pdf"
+    };
+    option (google.api.method_signature) = "name";
+  }
+
+  // Create an invoice from a settlement
+  // Convenience method to generate invoice from finalized settlement data
+  rpc CreateInvoiceFromSettlement(CreateInvoiceFromSettlementRequest) returns (omas.type.Invoice) {
+    option (google.api.http) = {
+      post: "/v1/{settlement=tenants/*/settlements/*}:createInvoice"
+      body: "*"
+    };
+    option (google.api.method_signature) = "settlement";
+  }
+
+  // Send a settlement invoice via SMTP with detailed settlement report
+  // Generates a settlement detail PDF, merges with invoice PDF, and sends via SMTP
+  rpc SendSettlementInvoice(SendSettlementInvoiceRequest) returns (SendSettlementInvoiceResponse) {
+    option (google.api.http) = {
+      post: "/v1/{settlement=tenants/*/settlements/*}:sendInvoice"
+      body: "*"
+    };
+    option (google.api.method_signature) = "settlement,email";
+  }
+
+  // Get settlement invoice PDF (merged invoice + settlement detail report)
+  // Returns the merged PDF for download without sending email
+  rpc GetSettlementInvoicePdf(GetSettlementInvoicePdfRequest) returns (GetSettlementInvoicePdfResponse) {
+    option (google.api.http) = {
+      get: "/v1/{settlement=tenants/*/settlements/*}:invoicePdf"
+    };
+    option (google.api.method_signature) = "settlement";
+  }
+}
+
+
+// Request message for CreateInvoice
+message CreateInvoiceRequest {
+  // Parent resource name: tenants/{tenant}
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      child_type: "omas.type/Invoice"
+    }
+  ];
+
+  // The invoice to create
+  omas.type.Invoice invoice = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Line items for the invoice
+  repeated omas.type.InvoiceLineItem line_items = 3;
+}
+
+// Request message for GetInvoice
+message GetInvoiceRequest {
+  // Resource name: tenants/{tenant}/invoices/{invoice}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Invoice"
+    }
+  ];
+
+  // View to return
+  InvoiceView view = 2;
+}
+
+// Request message for ListInvoices
+message ListInvoicesRequest {
+  // Parent tenant name
+  string tenant = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Maximum number of results to return
+  int32 page_size = 2;
+
+  // Pagination token
+  string page_token = 3;
+
+  // Filter expression (AIP-160)
+  // Supported fields: state, invoice_type, billing_account, settlement
+  // Example: "state=OPEN" or "billing_account=tenants/t1/billingAccounts/ba1"
+  string filter = 4;
+
+  // Ordering (AIP-132)
+  // Example: "invoice_date desc"
+  string order_by = 5;
+
+  // View to return
+  InvoiceView view = 6;
+}
+
+// Response message for ListInvoices
+message ListInvoicesResponse {
+  // List of invoices
+  repeated omas.type.Invoice invoices = 1;
+
+  // Token for next page
+  string next_page_token = 2;
+
+  // Total count (if requested)
+  int32 total_size = 3;
+}
+
+// Invoice view enum
+enum InvoiceView {
+  // Default view - basic fields only
+  INVOICE_VIEW_UNSPECIFIED = 0;
+
+  // Basic view - excludes line items
+  INVOICE_VIEW_BASIC = 1;
+
+  // Full view - includes all fields
+  INVOICE_VIEW_FULL = 2;
+}
+
+// Request message for UpdateInvoice
+message UpdateInvoiceRequest {
+  // The invoice to update
+  omas.type.Invoice invoice = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // Fields to update
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+// Request message for DeleteInvoice
+message DeleteInvoiceRequest {
+  // Resource name: tenants/{tenant}/invoices/{invoice}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Invoice"
+    }
+  ];
+}
+
+// Request message for SendInvoice
+message SendInvoiceRequest {
+  // Resource name: tenants/{tenant}/invoices/{invoice}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Invoice"
+    }
+  ];
+
+  // Email address to send invoice to (required for email send type)
+  string email = 2;
+
+  // Email subject line
+  string subject = 3;
+
+  // Email body text
+  string body = 4;
+
+  // CC email addresses
+  repeated string cc_emails = 5;
+
+  // BCC email addresses
+  repeated string bcc_emails = 6;
+}
+
+// Request message for MarkInvoiceSent
+message MarkInvoiceSentRequest {
+  // Resource name: tenants/{tenant}/invoices/{invoice}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Invoice"
+    }
+  ];
+
+  // How the invoice was sent
+  omas.type.Invoice_SendType send_type = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Optional date when it was sent (defaults to now)
+  string send_date = 3;
+}
+
+// Request message for RecordPayment
+message RecordPaymentRequest {
+  // Resource name: tenants/{tenant}/invoices/{invoice}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Invoice"
+    }
+  ];
+
+  // Payment amount in minor units (cents)
+  int64 amount_units = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Currency code
+  string currency_code = 3;
+
+  // Payment date (defaults to today)
+  string pay_date = 4;
+
+  // Check/reference number
+  string check_number = 5;
+
+  // Bank account ID (for sevdesk)
+  string check_account_id = 6;
+}
+
+// Request message for CancelInvoice
+message CancelInvoiceRequest {
+  // Resource name: tenants/{tenant}/invoices/{invoice}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Invoice"
+    }
+  ];
+
+  // Reason for cancellation
+  string reason = 2;
+}
+
+// Request message for ResetInvoiceToDraft
+message ResetInvoiceToDraftRequest {
+  // Resource name: tenants/{tenant}/invoices/{invoice}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Invoice"
+    }
+  ];
+}
+
+// Request message for GetInvoicePdf
+message GetInvoicePdfRequest {
+  // Resource name: tenants/{tenant}/invoices/{invoice}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Invoice"
+    }
+  ];
+
+  // Whether to re-render the PDF (useful for draft invoices)
+  bool force_render = 2;
+}
+
+// Response message for GetInvoicePdf
+message GetInvoicePdfResponse {
+  // URL to download the PDF
+  string pdf_url = 1;
+
+  // Base64-encoded PDF content (if requested)
+  bytes pdf_content = 2;
+
+  // Filename suggestion
+  string filename = 3;
+}
+
+// Request message for CreateInvoiceFromSettlement
+message CreateInvoiceFromSettlementRequest {
+  // Settlement resource name: tenants/{tenant}/settlements/{settlement}
+  string settlement = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Settlement"
+    }
+  ];
+
+  // Override invoice settings
+  omas.type.Invoice invoice_overrides = 2;
+
+  // Whether to automatically send the invoice after creation
+  bool auto_send = 3;
+
+  // Email details if auto_send is true
+  string email = 4;
+  string email_subject = 5;
+  string email_body = 6;
+}
+
+// Request message for SendSettlementInvoice
+message SendSettlementInvoiceRequest {
+  // Settlement resource name: tenants/{tenant}/settlements/{settlement}
+  string settlement = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Settlement"
+    }
+  ];
+
+  // Email address to send invoice to
+  string email = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Email subject line (optional - defaults to "Provisionsabrechnung {period}")
+  string subject = 3;
+
+  // Email body text (optional - default template will be used)
+  string body = 4;
+
+  // CC email addresses
+  repeated string cc_emails = 5;
+
+  // BCC email addresses
+  repeated string bcc_emails = 6;
+
+  // Include the settlement detail PDF attachment (default: true)
+  bool include_detail_report = 7;
+}
+
+// Response message for SendSettlementInvoice
+message SendSettlementInvoiceResponse {
+  // The message ID from the SMTP server
+  string message_id = 1;
+
+  // The invoice that was sent
+  omas.type.Invoice invoice = 2;
+
+  // Filename of the attached PDF
+  string attachment_filename = 3;
+
+  // The sender email address used for sending
+  string sender_email = 4;
+}
+
+// Request message for GetSettlementInvoicePdf
+message GetSettlementInvoicePdfRequest {
+  // Settlement resource name: tenants/{tenant}/settlements/{settlement}
+  string settlement = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Settlement"
+    }
+  ];
+
+  // Include the settlement detail report (default: true)
+  bool include_detail_report = 2;
+}
+
+// Response message for GetSettlementInvoicePdf
+message GetSettlementInvoicePdfResponse {
+  // The merged PDF content
+  bytes pdf_content = 1;
+
+  // Suggested filename for the PDF
+  string filename = 2;
+
+  // The invoice associated with this settlement
+  omas.type.Invoice invoice = 3;
+}
