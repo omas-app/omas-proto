@@ -27,6 +27,7 @@ message BillingAccountSnapshot {
 			type: "omas.type/BillingAccount"
 		}];
 
+	string display_name = 2;
 	string legal_name = 3;
 	string company_form = 4;
 	string tax_id = 5;
