@@ -23,6 +23,15 @@ option csharp_namespace = "Omas.Protos.V1";
 
 service OmasOrderService {
 
+	//preview order with totals, availability, etc.
+	rpc PreviewOrder(PreviewOrderRequest) returns (PreviewOrderResponse) {
+		option (google.api.http) = { 
+			post: "/v1/{parent=vendors/*}:previewOrder"
+			body: "*"
+		};
+		option (google.api.method_signature) = "parent";
+	}
+
 	//submit and charge order 
 	rpc PlaceOrder(PlaceOrderRequest) returns (PlaceOrderResponse) {
 		option (google.api.http) = { 
@@ -192,6 +201,12 @@ message PlaceOrderResponse {
 
     omas.type.Order order = 5;
 	string pay_url = 6;
+
+	// Opaque secret token for anonymous order access.
+	// Store securely - grants access to full order details.
+	// Pass via Authorization header: "Bearer <order_secret>"
+	// Format: URL-safe base64 encoded string (~43 characters).
+	string order_secret = 10;
 }
 
 message ConfirmOrderRequest {
@@ -292,9 +307,12 @@ message GetOrderRequest {
       type: "omas.type/Fulfillment"
     }];
 
-  //see: https://google.aip.dev/157
-  //default: BASIC for unauthenticated request
-  //default: FULL for authenticated request
+  // see: https://google.aip.dev/157
+  // View resolution:
+  // 1. Authenticated vendor request: FULL (default)
+  // 2. Valid order_secret in Authorization header: FULL (default)
+  // 3. Unauthenticated without secret: BASIC only
+  // 4. Invalid order_secret: PERMISSION_DENIED error
   OrderView view = 8;
 }
 
