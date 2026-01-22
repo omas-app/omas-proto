@@ -19,7 +19,7 @@ import "omas/type/product.proto";
 option csharp_namespace = "Omas.Protos";
 
 message Order {
-	reserved 5-6, 11;
+	reserved 5 to 6, 11;
 
 	//uid
 	string id = 1; 
