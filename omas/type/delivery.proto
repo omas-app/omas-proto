@@ -48,7 +48,9 @@ message DeliveryInfo {
 	// Notifications tied to delivery
 	Notifications notifications = 15  [json_name="notify"];
 
-
+	// Indicates this is a test delivery (redundant with Order.test).
+	// Provided for simpler POS integrations that may not check Order.test.
+	bool test = 20;
 }
 
 message DeliveryZone {

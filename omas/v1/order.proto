@@ -166,10 +166,18 @@ message PlaceOrderRequest {
 	// Authorization from PreviewOrderResponse - proves order was previewed
     OrderAuthorization authorization = 10;
 
-	// Indicates this is a test order for e2e testing.
-	// Test orders are propagated to the vendor's POS system but should not
-	// trigger real fulfillment or payments.
-	bool test_order = 15;
+	// Webhook URL for order status change notifications (out of band).
+	// Uses Standard Webhooks format (https://github.com/standard-webhooks/standard-webhooks):
+	// {
+	//   "type": "order.status",
+	//   "timestamp": "2024-01-15T12:00:00Z",
+	//   "data": {
+	//     "order": "vendors/{vendor}/orders/{order}",
+	//     "state": "Fulfillment.State",
+	//     "reason": "optional reason for state change"
+	//   }
+	// }
+	string tracking_url = 11;
 }
 
 message PlaceOrderResponse {

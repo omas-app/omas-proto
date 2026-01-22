@@ -39,7 +39,7 @@ message Order {
 
 	DeliveryInfo delivery = 7;
 	Payment payment = 8;
-	
+
 	Amount amount = 10;
 	
 	// The via tells how the order was created. 
@@ -54,6 +54,10 @@ message Order {
 		google.protobuf.Timestamp expire_time = 31;
 		google.protobuf.Duration ttl = 32 [(google.api.field_behavior) = INPUT_ONLY];
 	}
+
+	// If set, this is a test order for e2e testing.
+	// Contains expected POS behavior and callback for automated verification.
+	Test test = 61;
 
 	message Amount {
 		string currency = 1 [json_name="ccy"];
@@ -116,6 +120,39 @@ message Order {
 		// see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-CH-UA-Model
 		// example: Pixel 3 XL, iPhone 10
 		string device_model = 11;
+	}
+
+	// Test order configuration for e2e testing.
+	// When present, indicates this order should be propagated to the POS
+	// but not trigger real fulfillment or payments.
+	message Test {
+		// Expected action the POS system should take
+		ExpectedAction expected_action = 1;
+
+		// Webhook URL the POS should POST test results to (out of band).
+		// Uses Standard Webhooks format (https://github.com/standard-webhooks/standard-webhooks):
+		// {
+		//   "type": "order.test.result",
+		//   "timestamp": "2024-01-15T12:00:00Z",
+		//   "data": {
+		//     "order": "vendors/{vendor}/orders/{order}",
+		//     "action": "accept|decline|complete|timeout",
+		//     "success": true|false,
+		//     "message": "optional details"
+		//   }
+		// }
+		string callback_url = 2;
+
+		// Optional test scenario identifier
+		string scenario = 3;
+
+		enum ExpectedAction {
+			EXPECTED_ACTION_UNSPECIFIED = 0;
+			ACCEPT = 1;   // POS should accept the order
+			DECLINE = 2;  // POS should decline the order
+			COMPLETE = 3;  // POS should complete the order
+			TIMEOUT = 4;  // POS should not respond (test timeout handling)
+		}
 	}
 }
 
