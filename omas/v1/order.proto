@@ -112,6 +112,39 @@ service OmasOrderService {
 	}	
 }
 
+message PreviewOrderRequest {
+
+	// Format: vendors/{vendor}
+	string parent = 1 [
+		(google.api.field_behavior) = REQUIRED,
+		(google.api.resource_reference) = {
+			child_type: "omas.type/Order"
+		}];
+
+	omas.type.Order order = 5;
+}
+
+message PreviewOrderResponse {
+
+    // Validated/enriched order with calculated totals, availability, etc.
+    omas.type.Order order = 5;
+
+	// Merchant authorization for this specific order preview
+    OrderAuthorization authorization = 10;
+}
+
+message OrderAuthorization {
+    // Opaque signed token covering: order_hash + vendor_id + timestamp + terms
+    // Server verifies this on placeOrder()
+    bytes signature = 1;
+
+    // When this authorization expires (e.g., 15-30 minutes)
+    google.protobuf.Timestamp expires_at = 2;
+
+    // Hash of the authorized order state (allows client to detect drift)
+    bytes order_hash = 3;
+}
+
 message PlaceOrderRequest {
 
 	// Format: vendors/{vendor}
@@ -129,8 +162,14 @@ message PlaceOrderRequest {
 
 	//callback for payment provider
 	string status_url = 6;
-	
-	
+
+	// Authorization from PreviewOrderResponse - proves order was previewed
+    OrderAuthorization authorization = 10;
+
+	// Indicates this is a test order for e2e testing.
+	// Test orders are propagated to the vendor's POS system but should not
+	// trigger real fulfillment or payments.
+	bool test_order = 15;
 }
 
 message PlaceOrderResponse {
