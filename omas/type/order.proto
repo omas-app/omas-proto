@@ -55,6 +55,9 @@ message Order {
 		google.protobuf.Duration ttl = 32 [(google.api.field_behavior) = INPUT_ONLY];
 	}
 
+	//terms and marketing
+	Consent consent = 35;
+
 	// If set, this is a test order for e2e testing.
 	// Contains expected POS behavior and callback for automated verification.
 	Test test = 61;
@@ -120,6 +123,27 @@ message Order {
 		// see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-CH-UA-Model
 		// example: Pixel 3 XL, iPhone 10
 		string device_model = 11;
+	}
+
+	message Consent {
+
+		ConsentTerms terms = 1;
+		
+		ConsentMarketing marketing = 2;
+	}
+
+	message ConsentTerms {
+
+		string version = 1;
+
+		string hash = 2;
+	}
+
+	message ConsentMarketing {
+
+		google.protobuf.BoolValue email = 1;
+
+		google.protobuf.BoolValue push = 2;
 	}
 
 	// Test order configuration for e2e testing.
