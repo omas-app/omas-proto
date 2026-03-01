@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package omas.v1;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/api/client.proto";
+import "google/api/resource.proto";
+
+import "omas/type/payment.proto";
+
+option csharp_namespace = "Omas.Protos.V1";
+
+service OmasPaymentService {
+
+	//capture a held payment (transfer funds)
+	rpc CapturePayment(CapturePaymentRequest) returns (omas.type.Payment) {
+		option (google.api.http) = {
+			post: "/v1/{name=vendors/*/orders/*/payment}:capture"
+			body: "*"
+		};
+		option (google.api.method_signature) = "name";
+	}
+
+	//release a held payment (void authorization)
+	rpc ReleasePayment(ReleasePaymentRequest) returns (omas.type.Payment) {
+		option (google.api.http) = {
+			post: "/v1/{name=vendors/*/orders/*/payment}:release"
+			body: "*"
+		};
+		option (google.api.method_signature) = "name";
+	}
+
+	//get payment status (AIP-131)
+	rpc GetPayment(GetPaymentRequest) returns (omas.type.Payment) {
+		option (google.api.http) = {
+			get: "/v1/{name=vendors/*/orders/*/payment}"
+		};
+		option (google.api.method_signature) = "name";
+	}
+}
+
+message CapturePaymentRequest {
+
+  // The name of the payment to capture.
+  // Format: vendors/{vendor}/orders/{order}/payment
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Fulfillment"
+    }];
+}
+
+message ReleasePaymentRequest {
+
+  // The name of the payment to release.
+  // Format: vendors/{vendor}/orders/{order}/payment
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Fulfillment"
+    }];
+}
+
+message GetPaymentRequest {
+
+  // The name of the payment to retrieve.
+  // Format: vendors/{vendor}/orders/{order}/payment
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "omas.type/Fulfillment"
+    }];
+}
